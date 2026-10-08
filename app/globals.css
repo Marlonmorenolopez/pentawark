@@ -1,0 +1,579 @@
+/* app/globals.css — PentaWark v5.0 · Cyber Neon Theme */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   TEMA CLARO  (fallback accesible — modo oscuro es el primario)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --background:          215 28%  96%;
+  --foreground:          215 25%  12%;
+  --card:                0   0%  100%;
+  --card-foreground:     215 25%  12%;
+  --popover:             0   0%  100%;
+  --popover-foreground:  215 25%  12%;
+  --primary:             194 100%  40%;   /* cian oscurecido para claro */
+  --primary-foreground:  0   0%  100%;
+  --secondary:           215 20%  92%;
+  --secondary-foreground:215 25%  20%;
+  --muted:               215 20%  92%;
+  --muted-foreground:    215 16%  46%;
+  --accent:              215 20%  88%;
+  --accent-foreground:   215 25%  20%;
+  --destructive:         0   75%  55%;
+  --destructive-foreground: 0 0% 100%;
+  --success:             150 60%  35%;
+  --success-foreground:  0   0%  100%;
+  --warning:             43  90%  45%;
+  --warning-foreground:  0   0%  10%;
+  --border:              215 20%  82%;
+  --input:               215 20%  82%;
+  --ring:                194 100%  40%;
+  --radius:              0.375rem;
+  --sidebar:             215 20%  94%;
+  --sidebar-foreground:  215 25%  12%;
+  --sidebar-primary:     194 100%  40%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent:      215 20%  88%;
+  --sidebar-accent-foreground:  215 25%  20%;
+  --sidebar-border:      215 20%  82%;
+  --sidebar-ring:        194 100%  40%;
+  --chart-1:             0   75%  55%;
+  --chart-2:             25  90%  50%;
+  --chart-3:             43  90%  45%;
+  --chart-4:             150 60%  35%;
+  --chart-5:             194 100%  40%;
+
+  /* Tokens Cyber — modo claro (menos saturados) */
+  --cyber-accent:        #0097b3;
+  --cyber-accent-rgb:    0, 151, 179;
+  --cyber-purple:        #6d28d9;
+  --cyber-purple-rgb:    109, 40, 217;
+  --cyber-green:         #059669;
+  --cyber-red:           #dc2626;
+  --cyber-amber:         #d97706;
+  --cyber-blue:          #1d4ed8;
+  --cyber-blue-rgb:      29, 78, 216;
+  --cyber-magenta:       #a21caf;
+  --cyber-magenta-rgb:   162, 28, 175;
+  --cyber-glow:          rgba(0, 151, 179, 0.12);
+  --cyber-glow-strong:   rgba(0, 151, 179, 0.28);
+  --cyber-grid-color:    rgba(0, 151, 179, 0.05);
+  --cyber-surface:       rgba(255, 255, 255, 0.85);
+  --cyber-surface-2:     rgba(240, 245, 255, 0.9);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TEMA OSCURO  (modo primario de PentaWark)
+   ───────────────────────────────────────────────────────────── */
+.dark {
+  --background:          215 28%   6%;   /* #080c14 — negro azulado */
+  --foreground:          210 40%  91%;   /* #e2e8f0 */
+  --card:                215 28%   9%;   /* #0d1421 */
+  --card-foreground:     210 40%  91%;
+  --popover:             215 28%   9%;
+  --popover-foreground:  210 40%  91%;
+  --primary:             194 100%  50%;  /* #00d4ff — cian eléctrico */
+  --primary-foreground:  215 28%   6%;
+  --secondary:           215 25%  12%;
+  --secondary-foreground:210 40%  75%;
+  --muted:               215 25%  12%;
+  --muted-foreground:    215 16%  46%;
+  --accent:              215 25%  16%;
+  --accent-foreground:   210 40%  91%;
+  --destructive:         0   75%  55%;
+  --destructive-foreground: 0 0% 100%;
+  --success:             150 100%  50%;  /* #00ff88 — verde terminal */
+  --success-foreground:  215 28%   6%;
+  --warning:             43  100%  50%;  /* #ffb800 */
+  --warning-foreground:  215 28%   6%;
+  --border:              213  45%  18%;  /* #152840 */
+  --input:               213  45%  18%;
+  --ring:                194 100%  50%;
+  --sidebar:             215 28%   7%;
+  --sidebar-foreground:  210 40%  91%;
+  --sidebar-primary:     194 100%  50%;
+  --sidebar-primary-foreground: 215 28% 6%;
+  --sidebar-accent:      215 25%  14%;
+  --sidebar-accent-foreground:  210 40%  75%;
+  --sidebar-border:      213  45%  18%;
+  --sidebar-ring:        194 100%  50%;
+  --chart-1:             0   75%  60%;
+  --chart-2:             25  90%  55%;
+  --chart-3:             43  100%  50%;
+  --chart-4:             150 100%  50%;
+  --chart-5:             194 100%  50%;
+
+  /* Tokens Cyber — modo oscuro (plena saturación) */
+  --cyber-accent:        #00d4ff;
+  --cyber-accent-rgb:    0, 212, 255;
+  --cyber-purple:        #7c3aed;
+  --cyber-purple-rgb:    124, 58, 237;
+  --cyber-green:         #00ff88;
+  --cyber-red:           #ff3b3b;
+  --cyber-amber:         #ffb800;
+  --cyber-blue:          #3b82f6;
+  --cyber-blue-rgb:      59, 130, 246;
+  --cyber-magenta:       #e879f9;
+  --cyber-magenta-rgb:   232, 121, 249;
+  --cyber-glow:          rgba(0, 212, 255, 0.12);
+  --cyber-glow-strong:   rgba(0, 212, 255, 0.30);
+  --cyber-grid-color:    rgba(0, 212, 255, 0.035);
+  --cyber-surface:       rgba(13,  20,  33, 0.85);
+  --cyber-surface-2:     rgba(17,  24,  39, 0.90);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BASE
+   ───────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Forzar modo oscuro por defecto — es el modo primario de PentaWark */
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;
+  }
+
+  /* Selección de texto con color cyber */
+  ::selection {
+    background: rgba(var(--cyber-accent-rgb), 0.20);
+    color: var(--cyber-accent);
+  }
+
+  /* Scrollbar personalizada — solo webkit */
+  ::-webkit-scrollbar               { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track         { background: hsl(var(--background)); }
+  ::-webkit-scrollbar-thumb         { background: rgba(var(--cyber-accent-rgb), 0.25); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover   { background: rgba(var(--cyber-accent-rgb), 0.45); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   UTILIDADES CYBER  (disponibles como clases Tailwind arbitrarias)
+   ───────────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
+
+  /* Glow en box-shadow */
+  .cyber-glow {
+    box-shadow:
+      0 0 12px var(--cyber-glow),
+      0 0 28px var(--cyber-glow);
+  }
+  .cyber-glow-strong {
+    box-shadow:
+      0 0 20px var(--cyber-glow-strong),
+      0 0 50px var(--cyber-glow);
+  }
+
+  /* Glow en texto */
+  .cyber-glow-text {
+    text-shadow: 0 0 18px rgba(var(--cyber-accent-rgb), 0.55);
+  }
+
+  /* Bordes con tono cyber */
+  .cyber-border {
+    border: 1px solid rgba(var(--cyber-accent-rgb), 0.20);
+  }
+  .cyber-border-hover:hover {
+    border-color: rgba(var(--cyber-accent-rgb), 0.45);
+    box-shadow: 0 0 14px var(--cyber-glow);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  /* Grid de fondo animado */
+  .cyber-grid-bg {
+    background-image:
+      linear-gradient(var(--cyber-grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cyber-grid-color) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: gridPulse 10s ease-in-out infinite;
+  }
+
+  /* ── Profundidad / Holographic UI (Polish final) ──────────────────
+     Utilidades de superficie con sensación física real: highlight
+     superior (luz), sombra inferior (peso) y un leve realce interior.
+     Solo box-shadow/gradients — GPU-friendly, sin filtros costosos
+     salvo el backdrop-blur ya usado en Header/Sidebar. */
+  .glass-surface {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 40%),
+      hsl(var(--card));
+    backdrop-filter: blur(10px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 1px 0 rgba(0,0,0,0.20),
+      0 8px 24px -12px rgba(0,0,0,0.45);
+  }
+
+  /* Niveles de elevación — panel "flotando" sobre el fondo */
+  .depth-1 { box-shadow: 0 1px 2px rgba(0,0,0,0.20), 0 2px 8px -4px rgba(0,0,0,0.35); }
+  .depth-2 { box-shadow: 0 2px 6px rgba(0,0,0,0.25), 0 8px 20px -8px rgba(0,0,0,0.45); }
+  .depth-3 { box-shadow: 0 4px 12px rgba(0,0,0,0.30), 0 16px 40px -14px rgba(0,0,0,0.55); }
+
+  /* Borde holográfico sutil — gradiente de acento que recorre el borde */
+  .holo-edge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--cyber-accent-rgb), 0.35),
+    transparent 40%,
+    transparent 60%,
+    rgba(var(--cyber-accent-rgb), 0.20)
+  );
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  pointer-events: none;
+}
+
+  /* Glassmorphism */
+  .glass {
+    background: var(--cyber-surface);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(var(--cyber-accent-rgb), 0.12);
+  }
+  .glass-2 {
+    background: var(--cyber-surface-2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Esquinas decorativas (corner brackets) */
+  .corner-brackets {
+    position: relative;
+  }
+  .corner-brackets::before,
+  .corner-brackets::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: rgba(var(--cyber-accent-rgb), 0.50);
+    border-style: solid;
+  }
+  .corner-brackets::before {
+    top: 0; left: 0;
+    border-width: 2px 0 0 2px;
+    border-radius: 2px 0 0 0;
+  }
+  .corner-brackets::after {
+    bottom: 0; right: 0;
+    border-width: 0 2px 2px 0;
+    border-radius: 0 0 2px 0;
+  }
+
+  /* Línea de escaneo (scanline overlay) */
+  .scanline::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.04) 3px,
+      rgba(0, 0, 0, 0.04) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* Gradientes de texto */
+  .gradient-cyber {
+    background: linear-gradient(135deg, var(--cyber-accent) 0%, var(--cyber-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-cyber-green {
+    background: linear-gradient(135deg, var(--cyber-accent) 0%, var(--cyber-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Punto de estado pulsante */
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+  }
+  .status-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.3;
+    animation: statusPing 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  /* ── Semana 6: Efectos avanzados ── */
+
+  /* Contenedor de partículas — usar junto con .cyber-particle hijos */
+  .cyber-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Partícula individual — tamaño y posición vía inline style del componente */
+  .cyber-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--cyber-accent);
+    animation-name: particleFloat;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+  }
+
+  /* Línea de dato vertical — usar en contenedor con overflow:hidden */
+  .cyber-data-stream {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 40%;
+    background: linear-gradient(to bottom, transparent, var(--cyber-accent), transparent);
+    animation: dataStream linear infinite;
+    will-change: transform, opacity;
+  }
+
+  /* Grid con sweep sutil de profundidad (radar) */
+  .cyber-grid-sweep {
+    background-image:
+      linear-gradient(var(--cyber-grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cyber-grid-color) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: gridSweep 14s linear infinite alternate;
+  }
+
+  /* ── Home v3: ThreatMap (mapa conceptual de amenazas) ── */
+  .threatmap-pulse {
+    animation: threatmapPulse 2.6s ease-out infinite;
+    transform-origin: center;
+  }
+  .threatmap-link {
+    animation: threatmapFlow 3.5s linear infinite;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DESIGN SYSTEM v2 — "Cyber Security Command Center"
+   Formaliza el vocabulario visual ya existente (glass-surface,
+   depth-1/2/3, cyber-glow, corner-brackets...) en un sistema con
+   nombres semánticos consistentes. 100% aditivo — nada de lo de
+   arriba se modifica ni se elimina; los componentes existentes que
+   usan .depth-* / .glass-surface / .cyber-glow siguen funcionando igual.
+   ───────────────────────────────────────────────────────────── */
+@layer utilities {
+
+  /* ── SURFACES ──────────────────────────────────────────────────
+     4 niveles de elevación, del fondo de la app hacia el elemento
+     más "flotante". Cada nivel = más contraste + más profundidad,
+     nunca más blur (el blur se satura rápido y daña legibilidad). */
+
+  /* Surface 0 — el fondo de la aplicación. Nada flota aquí. */
+  .surface-0 { background: hsl(var(--background)); }
+
+  /* Surface 1 — paneles primarios (CyberCard/CyberPanel por defecto). */
+  .surface-1 {
+    background: hsl(var(--card));
+    box-shadow: 0 1px 2px rgba(0,0,0,0.20), 0 2px 8px -4px rgba(0,0,0,0.35); /* = .depth-1 */
+  }
+
+  /* Surface 2 — paneles elevados (hover de cards, paneles activos). */
+  .surface-2 {
+    background: hsl(var(--card));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 2px 6px rgba(0,0,0,0.25), 0 8px 20px -8px rgba(0,0,0,0.45); /* = .depth-2 + highlight */
+  }
+
+  /* Surface 3 — holográfico/flotante (modales, drawers, hero). = .glass-surface + .depth-3 */
+  .surface-3 {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 40%),
+      hsl(var(--card));
+    backdrop-filter: blur(10px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 4px 12px rgba(0,0,0,0.30), 0 16px 40px -14px rgba(0,0,0,0.55);
+  }
+
+  /* ── BORDER SYSTEM ─────────────────────────────────────────────
+     Un solo lenguaje de borde para toda la app: reposo, hover,
+     activo, y los 2 estados semánticos que más se repiten (crítico
+     / éxito). El resto de severidades (high/medium/low/info) ya las
+     cubre CyberCard/CyberBadge — no se duplican aquí. */
+  .border-cyber        { border-color: rgba(var(--cyber-accent-rgb), 0.18); }
+  .border-cyber-hover:hover { border-color: rgba(var(--cyber-accent-rgb), 0.40); }
+  .border-cyber-active { border-color: rgba(var(--cyber-accent-rgb), 0.55); }
+  .border-critical      { border-color: rgba(var(--cyber-red), 0.5); }
+  .border-success       { border-color: rgba(16, 185, 129, 0.5); }
+
+  /* ── GLOW SYSTEM ───────────────────────────────────────────────
+     .cyber-glow / .cyber-glow-strong (cyan) ya existían — se agregan
+     las variantes de color que faltaban. Mismo patrón, mismo peso
+     visual, para que ningún color "grite" más que otro. */
+  .glow-blue    { box-shadow: 0 0 12px rgba(var(--cyber-blue-rgb), 0.18),    0 0 28px rgba(var(--cyber-blue-rgb), 0.10); }
+  .glow-purple  { box-shadow: 0 0 12px rgba(var(--cyber-purple-rgb), 0.18), 0 0 28px rgba(var(--cyber-purple-rgb), 0.10); }
+  .glow-critical{ box-shadow: 0 0 12px rgba(248, 113, 113, 0.20),           0 0 28px rgba(248, 113, 113, 0.10); }
+  .glow-success { box-shadow: 0 0 12px rgba(16, 185, 129, 0.18),            0 0 28px rgba(16, 185, 129, 0.10); }
+  .glow-warning { box-shadow: 0 0 12px rgba(251, 191, 36, 0.18),            0 0 28px rgba(251, 191, 36, 0.10); }
+
+  /* ── TIPOGRAFÍA ────────────────────────────────────────────────
+     Jerarquía explícita: Marketing (display/h1) vs UI (h2/h3/body)
+     vs Data/Technical (mono, para IDs, targets, comandos, hashes). */
+  .text-display   { @apply text-4xl sm:text-5xl font-bold tracking-tight; }
+  .text-h1        { @apply text-3xl font-bold tracking-tight; }
+  .text-h2        { @apply text-xl  font-bold tracking-tight; }
+  .text-h3        { @apply text-base font-semibold; }
+  .text-body      { @apply text-sm leading-relaxed; }
+  .text-small     { @apply text-xs text-muted-foreground; }
+  .text-caption   { @apply text-[10px] uppercase tracking-wider text-muted-foreground font-mono; }
+  .text-technical { @apply font-mono text-xs tabular-nums; }
+}
+
+
+@keyframes gridPulse {
+  0%,  100% { opacity: 0.55; }
+  50%        { opacity: 1;    }
+}
+
+@keyframes cyberPulse {
+  0%,  100% { opacity: 1;   }
+  50%        { opacity: 0.3; }
+}
+
+@keyframes float {
+  0%,  100% { transform: translateY(0px);  }
+  50%        { transform: translateY(-7px); }
+}
+
+@keyframes glowPulse {
+  0%,  100% { box-shadow: 0 0  8px var(--cyber-glow);        }
+  50%        { box-shadow: 0 0 22px var(--cyber-glow-strong); }
+}
+
+@keyframes terminalBlink {
+  0%,  49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes statusPing {
+  0%   { transform: scale(1);   opacity: 0.3; }
+  75%  { transform: scale(2.2); opacity: 0;   }
+  100% { transform: scale(2.2); opacity: 0;   }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Semana 6: Efectos avanzados (CSS puro, sin Three.js) ── */
+
+/* Partícula individual: sube y se desvanece */
+@keyframes particleFloat {
+  0%   { transform: translateY(0)    translateX(0);   opacity: 0;   }
+  10%  { opacity: var(--particle-opacity, 0.6);                      }
+  90%  { opacity: var(--particle-opacity, 0.6);                      }
+  100% { transform: translateY(-100vh) translateX(var(--particle-drift, 20px)); opacity: 0; }
+}
+
+/* Línea de datos vertical (efecto "Matrix" sutil, sin texto) */
+@keyframes dataStream {
+  0%   { transform: translateY(-100%); opacity: 0;   }
+  10%  { opacity: 0.5;                                }
+  90%  { opacity: 0.5;                                }
+  100% { transform: translateY(100%);  opacity: 0;   }
+}
+
+/* Parpadeo de profundidad del grid — simula radar/sonar */
+@keyframes gridSweep {
+  0%   { background-position: 0% 0%;     }
+  100% { background-position: 100% 100%; }
+}
+
+/* Home v3 — ThreatMap: pulso de nodo (anillo expandiéndose) */
+@keyframes threatmapPulse {
+  0%   { r: 3;  opacity: 0.35; }
+  70%  { r: 16; opacity: 0;    }
+  100% { r: 16; opacity: 0;    }
+}
+
+/* Home v3 — ThreatMap: flujo de datos sobre las líneas entre nodos */
+@keyframes threatmapFlow {
+  to { stroke-dashoffset: -200; }
+}
+
+/* Acordeón (Radix) — se mantiene */
+@keyframes accordion-down {
+  from { height: 0; }
+  to   { height: var(--radix-accordion-content-height); }
+}
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to   { height: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ACCESIBILIDAD — respetar prefers-reduced-motion
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ACCESIBILIDAD — foco visible consistente (Fase 2)
+   No quita el outline nativo salvo que el propio elemento ya
+   defina su propio focus-visible (ej. ToolCard); solo homogeneiza
+   color/grosor para el resto de botones, links y controles.
+   ───────────────────────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--cyber-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

@@ -1,0 +1,1275 @@
+{
+  "notFound": {
+    "badge": "HTTP 404",
+    "title": "Ruta no encontrada",
+    "subtitle": "El escaneo de esta URL no arrojó ningún resultado. La página que buscas no existe o fue movida.",
+    "searchedPath": "Ruta solicitada",
+    "goHome": "Volver al inicio",
+    "goScanner": "Ir al Scanner",
+    "quickLinksTitle": "Accesos rápidos"
+  },
+  "nav": {
+    "home": "Inicio",
+    "scanner": "Escáner",
+    "codeScan": "Código",
+    "osint": "OSINT",
+    "history": "Historial",
+    "lab": "Laboratorio",
+    "docs": "Documentación",
+    "toggleTheme": "Cambiar tema",
+    "systemChecking": "Verificando",
+    "systemOnline": "Sistema Online",
+    "systemOffline": "Sistema Offline",
+    "systemTooltip": "Estado de conexión con el backend de PentaWark",
+    "github": "GitHub",
+    "schedules": "Programaciones",
+    "settings": "Ajustes",
+    "dashboard": "Dashboard",
+    "collapseSidebar": "Colapsar",
+    "openNav": "Abrir navegación",
+    "searchPlaceholder": "Buscar herramientas, secciones…",
+    "mainNavigation": "Navegación principal",
+    "closeNav": "Cerrar navegación",
+    "expandSidebar": "Expandir",
+    "searchLabel": "Buscar herramientas y secciones",
+    "clearSearch": "Borrar búsqueda",
+    "notifications": "Notificaciones"
+  },
+  "scanner": {
+    "title": "Iniciar análisis de Pentesting",
+    "tools": "herramientas",
+    "estimatedTime": "Tiempo estimado",
+    "legalTitle": "Aviso Legal y Ético",
+    "legalBody": "Solo escanea sistemas con autorización explícita. El uso no autorizado viola la Ley 1273/2009 (Colombia) y legislación internacional. Configurado solo para laboratorios locales.",
+    "targetLabel": "URL Objetivo",
+    "targetPlaceholder": "http://localhost:3001 o juice-shop:3000",
+    "labsTitle": "Laboratorios Disponibles",
+    "customUrlLabel": "URL personalizada",
+    "customUrlPlaceholder": "https://mi-sitio.com o http://192.168.1.10:8080",
+    "customUrlHint": "Ingresa cualquier URL HTTP/HTTPS. Asegúrate de tener autorización para escanearla.",
+    "useButton": "Usar",
+    "scanButton": "Escanear",
+    "scanningButton": "Escaneando",
+    "profileTitle": "Perfil de Escaneo",
+    "profiles": {
+      "light": "Ligero",
+      "lightDesc": "Rápido (~2 min)",
+      "normal": "Normal",
+      "normalDesc": "Balanceado (~10 min)",
+      "aggressive": "Agresivo",
+      "aggressiveDesc": "Profundo (~35 min)",
+      "custom": "Personalizado"
+    },
+    "advancedConfig": "Configuración Avanzada — Herramientas individuales",
+    "validationEmptyTarget": "Ingresa una URL objetivo",
+    "validationProtocol": "Solo se permiten URLs HTTP o HTTPS",
+    "validationInvalidUrl": "URL inválida. Formato correcto: http://ejemplo.com",
+    "errorTitle": "Error",
+    "close": "Cerrar",
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Medio",
+      "variable": "Variable"
+    },
+    "estimatedTimes": {
+      "fast": "~2 minutos",
+      "medium": "~10 minutos",
+      "slow": "~25 minutos",
+      "deep": "~35 minutos"
+    },
+    "heroTitle": "Pentesting",
+    "heroPipeline": "Pipeline automatizado: Wappalyzer → Nmap → Patator → Metasploit → ffuf → Gobuster → ZAP Spider → ZAP → Nuclei → SQLMap / Injection Scanner → Searchsploit",
+    "toolStateTitle": "Estado de Herramientas",
+    "labs": "Labs",
+    "globalRisk": "Riesgo Global",
+    "noFindings": "Sin hallazgos detectados",
+    "startingPipeline": "Iniciando pipeline de escaneo...",
+    "emptyState": "Introduce una URL objetivo para comenzar el análisis.",
+    "footerBrand": "PentaWark v5.0 · Cybersecurity & Ethical Hacking Platform",
+    "footerLegal": "Solo para uso ético y autorizado en entornos de prueba",
+    "formats": "Formatos:",
+    "optIn": "opt-in",
+    "alsoRuns": "También ejecuta: {tools}",
+    "kpi": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "completed": "Completadas",
+      "totalFindings": "Total Hallazgos"
+    },
+    "riskLevel": {
+      "COMPROMETIDO": "Comprometido",
+      "EXPUESTO": "Expuesto",
+      "VULNERABLE": "Vulnerable",
+      "PROTEGIDO": "Protegido",
+      "CRITICAL": "Comprometido",
+      "HIGH": "Expuesto",
+      "MEDIUM": "Vulnerable",
+      "LOW": "Vulnerable",
+      "MINIMAL": "Protegido"
+    },
+    "errorPage": {
+      "title": "Error en el Scanner",
+      "unexpected": "Ha ocurrido un error inesperado.",
+      "checklist": "Verifica que estén activos:",
+      "retry": "Reintentar"
+    }
+  },
+  "progress": {
+    "scanning": "Escaneando...",
+    "withErrors": "Escaneo con Errores",
+    "completed": "Escaneo Completado",
+    "cancel": "Cancelar",
+    "cancelConfirmYes": "Sí, cancelar",
+    "cancelConfirmNo": "No",
+    "overallProgress": "Progreso General",
+    "inProgress": "en progreso",
+    "stepError": "Error en la ejecución — el escaneo continúa con las herramientas restantes.",
+    "completedMessage": "¡Escaneo completado exitosamente!",
+    "completedDetail": "Revisa los resultados en el panel inferior. Duración total:",
+    "errorTitle": "El escaneo encontró errores",
+    "errorDetail": "Algunas herramientas no pudieron completarse. Los resultados pueden estar incompletos.",
+    "retry": "Reintentar",
+    "error": "error",
+    "errors": "errores"
+  },
+  "results": {
+    "title": "Resultados del Análisis",
+    "totalFindings": "Total hallazgos",
+    "technologies": "Tecnologías Detectadas",
+    "technologiesDesc": "Stack tecnológico identificado por Wappalyzer",
+    "ports": "Puertos y Servicios",
+    "portsDesc": "Puertos abiertos detectados por Nmap",
+    "vulnerabilities": "Vulnerabilidades Detectadas",
+    "vulnerabilitiesDesc": "Hallazgos de seguridad identificados por OWASP ZAP",
+    "noVulnerabilities": "No se detectaron vulnerabilidades",
+    "noVulnerabilitiesDetail": "¡El objetivo parece seguro o el escaneo no encontró issues!",
+    "noTechnologies": "No se detectaron tecnologías",
+    "noPorts": "No se detectaron puertos abiertos",
+    "noExploits": "No se encontraron exploits relacionados",
+    "noExploitsDetail": "Searchsploit no encontró exploits públicos coincidentes con las tecnologías detectadas.",
+    "directories": "Directorios Descubiertos",
+    "directoriesDesc": "Rutas encontradas por fuerza bruta con Gobuster",
+    "noDirectories": "No se descubrieron directorios",
+    "endpoints": "Endpoints y rutas API descubiertos por fuzzing",
+    "exploits": "Exploits Relacionados",
+    "exploitsDesc": "Vulnerabilidades conocidas de Exploit-DB que podrían afectar el sistema",
+    "port": "Puerto",
+    "service": "Servicio",
+    "version": "Versión",
+    "product": "Producto",
+    "status": "Estado",
+    "endpoint": "Endpoint",
+    "size": "Tamaño",
+    "target": "Objetivo:",
+    "started": "Iniciado:",
+    "finished": "Finalizado:",
+    "noSqlmap": "Sin resultados SQLMap",
+    "noSqlmapDetail": "Activa SQLMap en la configuración del escaneo para detectar inyecciones SQL en parámetros GET, POST y cookies.",
+    "credentialsFound": "Credenciales encontradas:",
+    "credentials": "credenciales",
+    "injections": "Injections",
+    "cvss": "CVSS",
+    "parameter": "Parámetro:",
+    "type": "Tipo:",
+    "dbms": "DBMS:",
+    "databases": "DBs:",
+    "url": "URL:",
+    "download": "Descargar:",
+    "scanCompleted": "Escaneo completado",
+    "scanCompletedDetail": "El análisis se ha completado exitosamente. Revisa los hallazgos en las pestañas inferiores.",
+    "scanWithErrors": "Escaneo con errores",
+    "scanWithErrorsDetail": "Algunas herramientas no pudieron completarse. Los resultados mostrados pueden estar incompletos.",
+    "scoreTitle": "Puntuación de Seguridad",
+    "risk": "Riesgo",
+    "gradeDescription": "Evaluación general basada en todos los hallazgos",
+    "recommendations": "Recomendaciones",
+    "solution": "Solución recomendada:",
+    "severities": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo",
+      "info": "Info"
+    },
+    "tabTech": "tecnologías",
+    "tabPorts": "puertos abiertos",
+    "tabEndpoints": "endpoints",
+    "tabDirectories": "directorios",
+    "tabVulns": "vulnerabilidades",
+    "tabNuclei": "hallazgos CVE",
+    "tabInjections": "inyecciones",
+    "tabCredentials": "credenciales",
+    "tabMSF": "módulos MSF",
+    "tabExploits": "exploits ExploitDB",
+    "tabThreatIntel": "señales externas",
+    "threatIntelTitle": "Reputación Externa",
+    "threatIntelSubtitle": "Qué se sabe ya del objetivo por fuentes externas (VirusTotal y próximamente más)",
+    "threatIntelEmpty": "Huella Digital no fue activada en este escaneo",
+    "nucleiTitle": "Hallazgos Nuclei",
+    "nucleiDesc": "Vulnerabilidades CVE, misconfiguraciones y exposiciones detectadas por plantillas Nuclei",
+    "noNuclei": "Sin hallazgos Nuclei",
+    "noNucleiDetail": "Activa la herramienta en la configuración del escaneo para detectar CVEs y misconfiguraciones conocidas.",
+    "injectionTitle": "Injection Scanner",
+    "patatorTitle": "Resultados Patator",
+    "patatorDesc": "Brute force multi-protocolo de formulario de login HTTP",
+    "noPatator": "Sin resultados Patator",
+    "noPatatorDetail": "Activa Patator en la configuración del escaneo para probar fuerza bruta en formularios de login.",
+    "ffufTitle": "Endpoints ffuf",
+    "noFfuf": "Sin resultados ffuf",
+    "noFfufDetail": "Activa ffuf en la configuración del escaneo para descubrir rutas y endpoints ocultos.",
+    "pentestingTitle": "Resultados de Pentesting",
+    "urgentAttention": "{count} requieren atención urgente",
+    "tabSummary": "Resumen",
+    "tabSummaryUnit": "hallazgos totales",
+    "summarySeverityTitle": "Vulnerabilidades por severidad",
+    "summarySeveritySubtitle": "Distribución real de este escaneo",
+    "summaryToolTitle": "Hallazgos por herramienta",
+    "summaryToolSubtitle": "Conteo real de este escaneo"
+  },
+  "report": {
+    "title": "Descargar reporte",
+    "subtitle": "Selecciona el formato y guarda el archivo donde prefieras.",
+    "recommended": "Recomendado",
+    "interactive": "Interactivo",
+    "rawData": "Datos crudos",
+    "pdfDesc": "Reporte profesional listo para imprimir o compartir. Incluye todas las secciones con formato visual.",
+    "htmlDesc": "Reporte interactivo que se abre en cualquier navegador. Ideal para revisar en detalle.",
+    "jsonDesc": "Datos estructurados del escaneo. Útil para integración con otras herramientas o análisis.",
+    "generating": "Generando...",
+    "downloaded": "¡Descargado!",
+    "saveAs": "Guardar como...",
+    "cancel": "Cancelar",
+    "button": "Descargar Reporte"
+  },
+  "language": {
+    "switchTo": "Switch to English",
+    "current": "ES"
+  },
+  "landing": {
+    "badge": "Plataforma Offensive Security · v5.0",
+    "heroTitle1": "Seguridad Web",
+    "heroTitle2": "Automatizada",
+    "heroSubtitle": "Orquesta 10 herramientas profesionales de ciberseguridad en un pipeline de 11 fases. Desde el reconocimiento hasta la explotación — con scoring CVSS/EPSS y reportes tipo pentest.",
+    "ctaStartScan": "Iniciar Escaneo",
+    "ctaViewLabs": "Ver Laboratorios",
+    "terminalWindowTitle": "pentawark — bash",
+    "terminalLine1": "WordPress 6.4, Apache 2.4, PHP 8.1",
+    "terminalLine2": "3 puertos abiertos: 22, 80, 443",
+    "terminalLine3": "2 SQLi, 4 XSS, 1 CSRF encontrados",
+    "terminalLine4": "CVE-2023-1234 confirmado (CVSS 9.8)",
+    "stat1Label": "Herramientas",
+    "stat2Label": "Fases de Escaneo",
+    "stat3Label": "Tipos de Ataque",
+    "stat4Label": "Formatos de Reporte",
+    "featuresEyebrow": "Capacidades",
+    "featuresTitle": "Funcionalidades Principales",
+    "feature1Title": "Orquestación Automática",
+    "feature1Desc": "Pipeline inteligente de 11 pasos: Wappalyzer, Nmap, Patator, Metasploit, ffuf, Gobuster, ZAP, Nuclei, SQLMap y Searchsploit en secuencia coordinada.",
+    "feature2Title": "Detección de Vulnerabilidades",
+    "feature2Desc": "Análisis DAST con OWASP ZAP y correlación automática con Exploit-DB. Scoring CVSS v3.1/v4.0 y EPSS para priorización de riesgos.",
+    "feature3Title": "Reconocimiento de Infraestructura",
+    "feature3Desc": "Descubre puertos, servicios, versiones y SO con Nmap y scripts NSE. Fingerprinting completo del stack tecnológico.",
+    "feature4Title": "Inteligencia de Exploits",
+    "feature4Desc": "Búsqueda offline en Exploit-DB con Searchsploit. Cada CVE correlaciona con las versiones de software detectadas en la fase de reconocimiento.",
+    "feature5Title": "Propagación de Sesión",
+    "feature5Desc": "Las cookies de autenticación capturadas por Patator se propagan a ZAP, Nuclei y SQLMap — los escaneos autenticados cubren el 100 % de la superficie.",
+    "feature6Title": "Reportes Profesionales",
+    "feature6Desc": "Informes de pentest exportables en HTML, PDF, JSON y CSV. Incluyen score de riesgo global, distribución de severidades y evidencia por herramienta.",
+    "toolsEyebrow": "Arsenal",
+    "toolsTitle": "Stack de Herramientas",
+    "toolsSubtitle": "10 herramientas profesionales coordinadas en un pipeline automatizado",
+    "toolViewDetails": "Ver detalles de {name}",
+    "toolStepOf": "{step} / {total} en el pipeline",
+    "toolModalConfirm": "Entendido",
+    "tool1Desc": "Fingerprinting del stack tecnológico",
+    "tool1Details": "Wappalyzer detecta las tecnologías que usa el objetivo: CMS, frameworks frontend y backend, servidores web, librerías JavaScript y plataformas de e-commerce. Es el primer paso del pipeline — su salida orienta todas las fases siguientes y alimenta la búsqueda de exploits en Searchsploit.",
+    "tool2Desc": "Escaneo de puertos y servicios",
+    "tool2Details": "Estándar de la industria para descubrimiento de redes. Escanea puertos TCP/UDP, detecta servicios activos, identifica versiones de software y ejecuta scripts NSE para obtener banners, certificados SSL y configuraciones expuestas.",
+    "tool3Desc": "Fuerza bruta multiprotocolo",
+    "tool3Details": "Herramienta de fuerza bruta modular. Prueba credenciales contra formularios HTTP/HTTPS, autenticación Basic/Digest, SSH y FTP. Las cookies obtenidas se propagan a ZAP, Nuclei y SQLMap para escaneos autenticados completos.",
+    "tool4Desc": "Validación controlada de exploits",
+    "tool4Details": "Ejecutado en modo controlado vía daemon RPC (msfrpcd). Lanza únicamente módulos auxiliares de verificación — no exploits destructivos — para confirmar si las vulnerabilidades detectadas son realmente explotables en el objetivo.",
+    "tool5Desc": "Fuzzer web de alta velocidad",
+    "tool5Details": "Fuzzer web escrito en Go — extremadamente rápido. Descubre contenido oculto, fuzzea parámetros GET/POST, identifica subdominios virtuales (vhost) y enumera endpoints de API no documentados con soporte para múltiples wordlists.",
+    "tool6Desc": "Enumeración de directorios y rutas",
+    "tool6Details": "Descubre rutas y archivos ocultos en servidores web mediante fuerza bruta con wordlists. Encuentra paneles de administración, archivos de configuración expuestos y endpoints de API no enlazados en el sitio.",
+    "tool7Desc": "DAST completo con Spider y Active Scan",
+    "tool7Details": "El escáner de seguridad web más usado del mundo. Rastrea el sitio con su Spider, luego ejecuta un Active Scan que prueba cada parámetro en busca de SQLi, XSS, CSRF, inyección de comandos y más de 40 tipos de ataques del catálogo OWASP.",
+    "tool8Desc": "Escaneo basado en plantillas YAML",
+    "tool8Details": "Ejecuta escaneos usando plantillas YAML de la comunidad. Cubre CVEs conocidos, configuraciones incorrectas, paneles expuestos y tecnologías obsoletas. Su biblioteca pública tiene miles de plantillas actualizadas continuamente.",
+    "tool9Desc": "Detección y explotación de inyección SQL",
+    "tool9Details": "Automatiza la detección y explotación de inyección SQL. Soporta todos los tipos (blind, error-based, time-based, UNION) y múltiples motores: MySQL, PostgreSQL, MSSQL y Oracle. Se ejecuta sobre parámetros descubiertos por ZAP y ffuf.",
+    "tool10Desc": "Búsqueda offline en Exploit-DB",
+    "tool10Details": "Interfaz CLI para Exploit-DB. Busca exploits públicos de forma offline usando las versiones detectadas por Wappalyzer y Nmap. Cada resultado incluye el path local al código del exploit y su referencia CVE para correlación de vulnerabilidades.",
+    "workflowEyebrow": "Pipeline",
+    "workflowTitle": "Flujo de Escaneo Automatizado",
+    "workflowSubtitle": "Secuencia optimizada de 10 fases con orquestación inteligente y propagación de sesión",
+    "step1Title": "Reconocimiento",
+    "step2Title": "Infraestructura",
+    "step3Title": "Credenciales",
+    "step4Title": "Validación",
+    "step5Title": "Fuzzing",
+    "step6Title": "Directorios",
+    "step7Title": "DAST",
+    "step8Title": "Plantillas",
+    "step9Title": "Inyección SQL",
+    "step10Title": "Exploits",
+    "labsEyebrow": "Entorno Controlado",
+    "labsTitle": "Laboratorios de Práctica",
+    "labsSubtitle": "Aplicaciones intencionalmente vulnerables. Practica de forma segura y legal.",
+    "labConfigureBtn": "Configurar Laboratorio",
+    "lab1Difficulty": "Todos los niveles",
+    "lab1Desc": "Aplicación Node.js con más de 100 retos. Cubre las vulnerabilidades del OWASP Top 10 en escenarios realistas.",
+    "lab1Badge": "Popular",
+    "lab2Difficulty": "Principiante",
+    "lab2Desc": "Damn Vulnerable Web Application. Entorno clásico para practicar SQLi, XSS, CSRF, File Upload y más.",
+    "lab2Badge": "Clásico",
+    "lab3Difficulty": "Intermedio",
+    "lab3Desc": "Tutoriales interactivos de OWASP con lecciones guiadas sobre vulnerabilidades web comunes.",
+    "lab3Badge": "Educativo",
+    "ctaFinalTitle": "Comienza tu Análisis Ahora",
+    "ctaFinalSubtitle": "Ejecuta tu primer escaneo completo con el stack v5.0. Resultados en minutos, reporte profesional listo para presentar.",
+    "ctaNewScan": "Nuevo Escaneo",
+    "ctaViewReports": "Ver Reportes Anteriores",
+    "legalNotice": "Solo para uso ético y autorizado · Ley 1273/2009 Colombia",
+    "footerTagline": "PentaWark · Solo para uso ético y autorizado"
+  },
+  "docs": {
+    "pageTitle": "Documentación",
+    "pageSubtitle": "Guía completa de herramientas y API de PentaWark v5.0",
+    "tabTools": "Herramientas",
+    "tabApi": "API",
+    "tabArchitecture": "Arquitectura",
+    "searchPlaceholder": "Buscar herramienta o capacidad…",
+    "searchNoResults": "Sin resultados para “{query}”",
+    "featuresLabel": "Características",
+    "usageLabel": "Uso",
+    "apiTitle": "API REST",
+    "apiSubtitle": "Endpoints disponibles para integración programática",
+    "endpoint1Desc": "Iniciar un nuevo escaneo",
+    "endpoint2Desc": "Obtener estado del escaneo",
+    "endpoint3Desc": "Descargar reporte",
+    "endpoint4Desc": "Listar escaneos anteriores",
+    "bodyLabel": "Body",
+    "responseLabel": "Response",
+    "paramsLabel": "Params",
+    "exampleTitle": "Ejemplo de Uso",
+    "exampleSubtitle": "Integración básica con JavaScript/TypeScript",
+    "archTitle": "Arquitectura v5.0",
+    "archSubtitle": "Flujo de escaneo orquestado de 10 fases",
+    "archStep1": "Reconocimiento",
+    "archStep2": "Infraestructura",
+    "archStep3": "Credenciales",
+    "archStep4": "Validación",
+    "archStep5": "Fuzzing",
+    "archStep6": "Directorios",
+    "archStep7": "DAST",
+    "archStep8": "Plantillas",
+    "archStep9": "Inyección SQL",
+    "archStep10": "Exploits",
+    "stackTitle": "Stack Tecnológico",
+    "stackFrontend": "Frontend",
+    "stackBackend": "Backend",
+    "fileStructureTitle": "Estructura de Archivos",
+    "goToScanner": "Ir al Scanner",
+    "configureLab": "Configurar Lab"
+  },
+  "lab": {
+    "pageTitle": "Laboratorio de Práctica",
+    "pageSubtitle": "Aplicaciones vulnerables para pruebas de seguridad éticas y legales. Los estados se sincronizan con Docker cada 5 segundos.",
+    "dockerRequiredTitle": "Requisito: Docker",
+    "dockerRequiredDesc": "Las aplicaciones corren en contenedores Docker aislados. Asegúrate de que Docker esté activo antes de iniciarlas.",
+    "securityNoticeTitle": "Aviso de Seguridad",
+    "securityNoticeDesc": "Estas apps contienen vulnerabilidades reales. Úsalas solo en localhost y nunca las expongas a redes públicas.",
+    "controlTitle": "Control del Laboratorio",
+    "controlRunning": "{running} de {total} aplicaciones en ejecución",
+    "controlSyncing": "sincronizando",
+    "btnRefresh": "Actualizar",
+    "btnStartAll": "Iniciar Todas",
+    "btnStopAll": "Detener Todas",
+    "statusStarting": "Iniciando",
+    "statusHealthy": "Listo",
+    "statusStopped": "Detenido",
+    "statusStopping": "Deteniendo",
+    "statusError": "Error",
+    "techPort": "Puerto",
+    "techImage": "Imagen",
+    "techScanUrl": "Scan URL",
+    "credentialsLabel": "Credenciales por defecto",
+    "userLabel": "user",
+    "passLabel": "pass",
+    "vulnerabilitiesLabel": "Vulnerabilidades:",
+    "btnStop": "Detener",
+    "btnStart": "Iniciar",
+    "btnStarting": "Iniciando...",
+    "btnStopping": "Deteniendo...",
+    "waitingHealthy": "Esperando que la app esté lista...",
+    "openApp": "Abrir {name}",
+    "scanThisLab": "Escanear este lab",
+    "activityLogTitle": "Registro de Actividad",
+    "activityLogSubtitle": "Logs de operaciones del laboratorio",
+    "btnClear": "Limpiar",
+    "noRecentActivity": "Sin actividad reciente...",
+    "manualCommandsTitle": "Comandos Docker Manuales",
+    "manualCommandsSubtitle": "Si prefieres ejecutar los contenedores desde terminal",
+    "footerTagline": "PentaWark v5.0 · Laboratorio Docker · Solo uso ético y autorizado",
+    "logAppReady": "{name} listo — abre http://localhost:{port}",
+    "logStarting": "Iniciando {name}...",
+    "logStartingHealthcheck": "{name} iniciando — esperando healthcheck en puerto {port}...",
+    "logStartError": "Error al iniciar {name}: {error}",
+    "logUnknownError": "desconocido",
+    "logBackendUnavailableStart": "Backend no responde — simulando inicio de {name}",
+    "logSimulatedStarted": "{name} simulado como iniciado.",
+    "logStopping": "Deteniendo {name}...",
+    "logStopped": "{name} detenido.",
+    "logStopError": "Error al detener {name}: {error}",
+    "logBackendUnavailableStop": "Backend no responde — simulando detención de {name}",
+    "app1Desc": "Tienda moderna con vulnerabilidades OWASP Top 10. Ideal para todos los niveles.",
+    "app1Cred1Note": "Admin",
+    "app1Cred2Note": "Usuario Star Trek",
+    "app2Desc": "Damn Vulnerable Web Application. Clásico para aprender SQLi, XSS y CSRF.",
+    "app2Cred1Note": "Admin por defecto",
+    "app2Cred2Note": "Usuario normal",
+    "app3Desc": "Tutoriales interactivos de seguridad OWASP. Aprende atacando y defendiendo.",
+    "app3Cred1Note": "Registro libre",
+    "app3Cred2Note": "Admin"
+  },
+  "schedules": {
+    "title": "Escaneos programados",
+    "subtitle": "Cada programación crea un Web Scan normal en la hora indicada (UTC), ejecutado por Celery Beat.",
+    "newTitle": "Nueva programación",
+    "targetLabel": "Objetivo (URL/host del Web Scan)",
+    "targetPlaceholder": "https://ejemplo.com",
+    "frequencyLabel": "Frecuencia",
+    "frequencyDaily": "Diaria",
+    "frequencyWeekly": "Semanal",
+    "frequencyMonthly": "Mensual",
+    "timeLabel": "Hora (UTC)",
+    "weekdayLabel": "Día de la semana",
+    "monthDayLabel": "Día del mes",
+    "createButton": "Crear programación",
+    "creating": "Creando…",
+    "createdToast": "Programación creada",
+    "createErrorToast": "No se pudo crear la programación",
+    "targetRequired": "El objetivo es requerido",
+    "active": "Activa",
+    "paused": "Pausada",
+    "nextRun": "Próxima",
+    "lastRun": "Última",
+    "pauseAction": "Pausar",
+    "resumeAction": "Reanudar",
+    "deleteAction": "Eliminar programación",
+    "pausedToast": "Programación pausada",
+    "resumedToast": "Programación reanudada",
+    "deletedToast": "Programación eliminada",
+    "updateErrorToast": "No se pudo actualizar la programación",
+    "deleteErrorToast": "No se pudo eliminar la programación",
+    "loadErrorTitle": "No se pudo cargar el historial",
+    "retry": "Reintentar",
+    "emptyTitle": "Sin programaciones todavía",
+    "emptyDetail": "Crea una arriba para que PentaWark escanee tu objetivo automáticamente.",
+    "weekdays": [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado"
+    ]
+  },
+  "compare": {
+    "backToHistory": "Volver al historial",
+    "title": "Comparación de escaneos",
+    "loading": "Comparando escaneos…",
+    "errorTitle": "No se pudo generar la comparación",
+    "missingParams": "Faltan los dos escaneos a comparar (parámetros ?a= y ?b=).",
+    "new": "Nuevos",
+    "resolved": "Resueltos",
+    "persistent": "Persistentes",
+    "modified": "Modificados",
+    "newFindings": "Nuevos hallazgos",
+    "resolvedFindings": "Hallazgos resueltos",
+    "none": "Ninguno",
+    "before": "antes",
+    "after": "ahora"
+  },
+  "notificationSettings": {
+    "title": "Notificaciones",
+    "subtitle": "Elige a dónde avisar cuando un Job termine. Las credenciales del servidor de correo (host, usuario, contraseña) se configuran únicamente en el servidor — acá solo se elige el destinatario y qué eventos disparan cada canal.",
+    "email": "Email",
+    "emailRecipient": "Destinatario",
+    "emailPlaceholder": "alertas@tuempresa.com",
+    "webhook": "Webhook",
+    "webhookUrl": "URL",
+    "webhookPlaceholder": "https://tu-servicio.com/webhooks/pentawark",
+    "webhookSsrfNote": "No se permiten URLs hacia localhost, IPs privadas o endpoints de metadata de la nube (protección SSRF).",
+    "events": "Eventos",
+    "eventCompleted": "Job completado",
+    "eventFailed": "Job falló",
+    "eventCancelled": "Job cancelado",
+    "save": "Guardar configuración",
+    "saving": "Guardando…",
+    "savedToast": "Configuración de notificaciones guardada",
+    "saveErrorToast": "No se pudo guardar la configuración",
+    "loadErrorTitle": "No se pudo cargar la configuración",
+    "retry": "Reintentar",
+    "minSeverity": "Severidad mínima para notificar",
+    "minSeverityHint": "Solo aplica a \"Job completado\" — fallos y cancelaciones siempre avisan.",
+    "sevInfo": "Cualquier resultado (incluso limpio)",
+    "sevLow": "Baja o superior",
+    "sevMedium": "Media o superior",
+    "sevHigh": "Alta o superior",
+    "sevCritical": "Solo crítica",
+    "breadcrumb": "Ruta de navegación",
+    "breadcrumbSettings": "Configuración"
+  },
+  "navCatalog": {
+    "sections": {
+      "pentesting": {
+        "label": "Pentesting",
+        "description": "Evalúa y explota vulnerabilidades en tus objetivos.",
+        "groups": {
+          "reconocimiento": "Reconocimiento",
+          "enumeracion": "Enumeración",
+          "webSecurity": "Web Security",
+          "authentication": "Authentication",
+          "sqlInjection": "SQL Injection",
+          "exploitation": "Exploitation"
+        }
+      },
+      "osint": {
+        "label": "OSINT",
+        "description": "Recopila información pública y descubre lo que otros no ven.",
+        "groups": {
+          "personas": "Personas",
+          "dominios": "Dominios",
+          "breaches": "Breaches"
+        }
+      },
+      "huella-digital": {
+        "label": "Huella Digital",
+        "description": "Analiza la exposición y huella en internet de tus activos.",
+        "groups": {
+          "dominios": "Dominios",
+          "infraestructura": "Infraestructura",
+          "reputacion": "Reputación",
+          "tlsSsl": "TLS / SSL"
+        }
+      },
+      "code-security": {
+        "label": "Code Security",
+        "description": "Analiza tu código y dependencias en busca de riesgos.",
+        "groups": {
+          "secrets": "Secrets",
+          "sast": "SAST",
+          "backdoors": "Backdoors",
+          "dependencies": "Dependencies",
+          "containers": "Containers"
+        }
+      },
+      "laboratorios": {
+        "label": "Laboratorios",
+        "description": "Practica en entornos seguros y aprende con escenarios reales.",
+        "groups": {
+          "entornos": "Entornos"
+        }
+      },
+      "analisis": {
+        "label": "Análisis",
+        "description": "Convierte los resultados en información valiosa y accionable.",
+        "groups": {
+          "findingsRiskScoring": "Findings & Risk Scoring",
+          "compararAnalisis": "Comparar Análisis",
+          "reportes": "Reportes"
+        }
+      },
+      "operaciones": {
+        "label": "Operaciones",
+        "description": "Gestiona tus escaneos, historial y configuración.",
+        "groups": {
+          "historial": "Historial",
+          "programacion": "Programación",
+          "notificaciones": "Notificaciones"
+        }
+      }
+    },
+    "leaves": {
+      "inicio": "Inicio",
+      "dashboard": "Dashboard",
+      "docs": "Documentación",
+      "findings": "Findings",
+      "compare": "Comparar Análisis",
+      "timeline": "Tendencias",
+      "historial": "Historial",
+      "schedules": "Escaneos Programados",
+      "notifications": "Notificaciones",
+      "settings": "Configuración"
+    },
+    "operationsPanel": {
+      "quickAccess": "Ver todas"
+    },
+    "topGroups": {
+      "security": "Security",
+      "labs": "Laboratorios",
+      "analysis": "Análisis",
+      "operations": "Operaciones"
+    },
+    "overview": {
+      "pentestingTools": "Herramientas de Pentesting",
+      "footprintTools": "Herramientas de Huella Digital",
+      "codeSecurityTools": "Herramientas de Code Security",
+      "labsAvailable": "Laboratorios Disponibles"
+    }
+  },
+  "dashboard": {
+    "securityOverview": "Security Overview",
+    "welcomePrefix": "Bienvenido a",
+    "subtitle": "Plataforma integral de ciberseguridad para análisis, evaluación y protección de tus activos.",
+    "technicalTitle": "Dashboard técnico",
+    "technicalSubtitle": "Datos reales agregados de todos tus escaneos — Web Scan, Code Scan y OSINT juntos.",
+    "statusOperational": "OPERATIVO",
+    "statusChecking": "VERIFICANDO",
+    "statusDegraded": "DEGRADADO",
+    "securityPosture": "Postura de Seguridad",
+    "securityPostureSubtitle": "Score, riesgo y hallazgos acumulados de todos tus escaneos",
+    "securityOperations": "Actividad de Seguridad",
+    "securityOperationsSubtitle": "Distribución por módulo y severidad de todos tus escaneos",
+    "byModuleTitle": "Escaneos por módulo",
+    "statTotalScans": "Total escaneos",
+    "statTotalFindings": "Hallazgos totales",
+    "statCritical": "Críticos",
+    "statHigh": "Altos",
+    "scoreAverage": "Score promedio",
+    "loadingStats": "Cargando estadísticas…",
+    "loadErrorTitle": "No se pudo cargar el dashboard",
+    "retry": "Reintentar",
+    "emptyScansTitle": "Todavía no hay escaneos",
+    "emptyScansDetail": "Corre tu primer Web Scan, Code Scan u OSINT y este dashboard se va a llenar solo con datos reales.",
+    "severityTitle": "Distribución de severidad",
+    "severitySubtitle": "Todos los hallazgos, todas las familias de scan",
+    "toolTitle": "Herramientas con más hallazgos",
+    "toolSubtitle": "Acumulado histórico",
+    "recentActivityTitle": "Actividad reciente",
+    "recentActivitySubtitle": "Últimos 10 Jobs, cualquier familia"
+  },
+  "severity": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "info": "Info",
+    "empty": "Sin hallazgos registrados todavía."
+  },
+  "severityPanel": {
+    "title": "Security Analysis",
+    "subtitle": "Distribución de severidad — todos los hallazgos de tu historial"
+  },
+  "toolDetail": {
+    "close": "Cerrar",
+    "target": "Target",
+    "statusLabel": "Estado",
+    "result": "Resultado",
+    "features": "Capacidades",
+    "usage": "Uso real",
+    "officialDocs": "Documentación oficial",
+    "noDocs": "Todavía no hay documentación detallada para esta herramienta en el proyecto.",
+    "executionNote": "Esta herramienta no se ejecuta de forma individual: corre como parte de un único Web Scan orquestado junto con el resto de herramientas de Pentesting.",
+    "status": {
+      "idle": "En espera",
+      "running": "Ejecutando",
+      "completed": "Completado",
+      "error": "Error",
+      "skipped": "Omitido"
+    }
+  },
+  "toolCard": {
+    "status": {
+      "idle": "En espera",
+      "running": "Ejecutando",
+      "completed": "Completado",
+      "error": "Error",
+      "skipped": "Omitido"
+    },
+    "result": "Resultado"
+  },
+  "module": {
+    "security": "Security",
+    "breadcrumb": "Ruta de navegación"
+  },
+  "settingsPage": {
+    "title": "Configuración",
+    "description": "Preferencias de la interfaz y estado de la configuración del servidor. Las notificaciones tienen su propia pantalla.",
+    "interface": {
+      "title": "Interfaz",
+      "subtitle": "Preferencias guardadas en este navegador",
+      "language": "Idioma",
+      "languageHint": "Cambia entre español e inglés",
+      "languageName": {
+        "es": "Español",
+        "en": "English"
+      },
+      "theme": "Tema",
+      "themeHint": "Claro, oscuro o el del sistema",
+      "themeOption": {
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      }
+    },
+    "server": {
+      "title": "Servidor",
+      "subtitle": "Estado y configuración que informa el backend (solo lectura)",
+      "refresh": "Actualizar",
+      "readOnlyNote": "Estos valores los define el servidor mediante variables de entorno. Se muestran solo para consulta: no se pueden modificar desde aquí.",
+      "loading": "Cargando configuración del servidor…",
+      "unreachableTitle": "No se pudo contactar al servidor",
+      "unreachableDetail": "Verifica que el backend esté activo e inténtalo de nuevo.",
+      "status": "Estado",
+      "storage": "Almacenamiento de análisis",
+      "storageHint": "Dónde guarda el backend los análisis",
+      "storageRedis": "Redis",
+      "storageFallback": "Memoria local (fallback)",
+      "zap": "OWASP ZAP",
+      "zapHint": "Conexión con el demonio de ZAP",
+      "configured": "Configurado",
+      "notConfigured": "No configurado",
+      "version": "Versión del backend",
+      "labRestriction": "Restricción a laboratorios",
+      "labRestrictionHint": "Si está activa, el backend solo acepta los objetivos permitidos",
+      "enabled": "Activa",
+      "disabled": "Inactiva",
+      "unknown": "Sin información",
+      "allowedTargets": "Objetivos permitidos",
+      "allowedTargetsHint": "Lista de laboratorios aceptados por el backend",
+      "none": "Ninguno",
+      "reportFormats": "Formatos de reporte",
+      "metasploit": "Metasploit",
+      "metasploitHint": "Modo de ejecución informado por el backend",
+      "metasploitLive": "En vivo",
+      "metasploitSimulation": "Simulación",
+      "availableTools": "Herramientas registradas en el backend",
+      "availableToolsHint": "Incluye Pentesting, Huella Digital, OSINT y Code Security",
+      "empty": "El servidor no devolvió información de configuración."
+    },
+    "related": {
+      "title": "Otras pantallas",
+      "subtitle": "Configuración que vive en su propia pantalla",
+      "notifications": {
+        "title": "Notificaciones",
+        "detail": "Email y webhook al terminar un análisis."
+      },
+      "schedules": {
+        "title": "Escaneos programados",
+        "detail": "Administra los análisis recurrentes."
+      },
+      "docs": {
+        "title": "Documentación",
+        "detail": "Guías y referencia de las herramientas."
+      }
+    }
+  },
+  "footprint": {
+    "title": "Huella Digital",
+    "errorTitle": "Error",
+    "close": "Cerrar",
+    "starting": "Iniciando análisis de Huella Digital…",
+    "collecting": "Recopilando datos de las fuentes externas…",
+    "partial": "Análisis en curso: se muestran los resultados recibidos hasta ahora.",
+    "footerBrand": "PentaWark v5.0 · Cybersecurity & Ethical Hacking Platform",
+    "footerLegal": "Solo para uso ético y autorizado",
+    "coverage": "{withData}/{total} fuentes con datos",
+    "coverageHint": "Fuentes que devolvieron datos reales de las que aplican a esta vista",
+    "executionNote": "Esta fuente no se ejecuta de forma individual: corre en paralelo con el resto de fuentes de Huella Digital seleccionadas.",
+    "form": {
+      "title": "Analizar superficie externa",
+      "subtitle": "Lanza solo la fase de Huella Digital: no se ejecuta ninguna herramienta de Pentesting.",
+      "targetLabel": "Dominio o IP objetivo",
+      "targetPlaceholder": "example.com o 203.0.113.10",
+      "targetRequired": "Ingresa un dominio, una IP o una URL.",
+      "sourcesLabel": "Fuentes",
+      "selectAll": "Todas",
+      "clearAll": "Ninguna",
+      "needsApiKey": "Requiere API key en el servidor",
+      "noSourcesSelected": "Selecciona al menos una fuente.",
+      "submit": "Analizar huella digital",
+      "submitting": "Analizando…",
+      "noteApiKeys": "VirusTotal, AbuseIPDB y Google Safe Browsing necesitan su API key configurada en el servidor; sin ella devuelven «sin datos reales».",
+      "notePublicTargets": "Los datos externos solo existen para dominios o IPs públicos. Con los laboratorios locales las fuentes suelen responder «sin datos reales», y el servidor puede restringir los objetivos permitidos (ver Configuración)."
+    },
+    "recent": {
+      "title": "Análisis recientes"
+    },
+    "empty": {
+      "title": "Sin datos disponibles",
+      "detail": "Indica un dominio o IP y elige las fuentes para ver su huella digital."
+    },
+    "notIncluded": {
+      "title": "Este análisis no incluyó Huella Digital",
+      "detail": "Se ejecutó con la recopilación de Huella Digital desactivada. Lanza un análisis desde aquí para obtenerla."
+    },
+    "noResults": {
+      "title": "Sin datos disponibles",
+      "detail": "No se encontraron resultados para este análisis."
+    },
+    "status": {
+      "target": "Objetivo",
+      "footprintPhase": "Fase de Huella Digital",
+      "originFootprintOnly": "Análisis de solo Huella Digital.",
+      "scan": {
+        "pending": "Pendiente",
+        "running": "En curso",
+        "completed": "Completado",
+        "error": "Error",
+        "cancelled": "Cancelado"
+      },
+      "phase": {
+        "idle": "en espera",
+        "running": "en curso",
+        "completed": "completada",
+        "error": "con error",
+        "skipped": "omitida"
+      }
+    },
+    "state": {
+      "noValue": "sin datos",
+      "data": {
+        "title": "Con datos",
+        "detail": "La fuente devolvió datos reales.",
+        "short": "Con datos"
+      },
+      "noData": {
+        "title": "Sin datos reales",
+        "detail": "La fuente no devolvió información real (por ejemplo, falta la API key, el host es interno o la herramienta no está disponible). No significa «0 resultados».",
+        "short": "Sin datos reales"
+      },
+      "error": {
+        "title": "Con error",
+        "detail": "Se intentó consultar la fuente pero falló.",
+        "short": "Con error"
+      },
+      "notRun": {
+        "title": "No ejecutada",
+        "detail": "Esta fuente no forma parte de este análisis o aún no devolvió resultados.",
+        "short": "No ejecutada"
+      }
+    },
+    "surface": {
+      "title": "Superficie descubierta",
+      "subdomains": "Subdominios",
+      "subdomainsHint": "Vía Certificate Transparency",
+      "ips": "IPs",
+      "ipsHint": "Reportadas por Shodan / AbuseIPDB",
+      "ports": "Puertos expuestos",
+      "portsHint": "Vistos desde internet",
+      "lookalikes": "Dominios similares",
+      "lookalikesHint": "Ya registrados (typosquatting)",
+      "riskSignals": "Señales de riesgo",
+      "riskSignalsHint": "Suma de señales de las fuentes con datos. No es un score de seguridad.",
+      "riskSignalsNone": "Ninguna fuente devolvió datos reales todavía."
+    },
+    "domain": {
+      "title": "Domain Intelligence",
+      "subtitle": "Subdominios y dominios parecidos al objetivo",
+      "subdomains": "Subdominios (crt.sh)",
+      "noSubdomains": "crt.sh no registra subdominios para este dominio",
+      "subdomainsSummary": "{subdomains, plural, one {# subdominio} other {# subdominios}} en {certificates, plural, one {# certificado} other {# certificados}}",
+      "moreInDetail": "+{count} más en el detalle por fuente",
+      "lookalikes": "Dominios similares (dnstwist)",
+      "noLookalikes": "No se encontraron dominios parecidos registrados",
+      "candidatesChecked": "Variantes comprobadas: {count}",
+      "lookalikesSummary": "{registered, plural, one {# registrado} other {# registrados}} de {checked} variantes comprobadas"
+    },
+    "infra": {
+      "title": "Infrastructure Intelligence",
+      "subtitle": "Exposición de la IP vista desde internet",
+      "addresses": "Direcciones y hostnames",
+      "moreHostnames": "+{count} hostnames más en el detalle por fuente",
+      "ports": "Puertos abiertos",
+      "noPorts": "Shodan no registra puertos abiertos",
+      "cves": "CVEs asociados",
+      "noCves": "Sin CVEs asociados",
+      "cvesCaveat": "Se deducen por la versión del banner: pueden ser falsos positivos si el servicio está parchado.",
+      "tags": "Tags",
+      "networkContext": "Contexto de red (AbuseIPDB)",
+      "country": "País",
+      "isp": "ISP",
+      "usageType": "Tipo de uso"
+    },
+    "reputation": {
+      "title": "Reputation Intelligence",
+      "subtitle": "Lo que dicen las fuentes de reputación",
+      "vtFlagged": "{count, plural, one {# motor lo marca} other {# motores lo marcan}}",
+      "vtClean": "Sin marcas",
+      "vtBreakdown": "{malicious} malicioso · {suspicious} sospechoso · {harmless} inofensivo · {undetected} no detectado",
+      "abuseScore": "Score {score}/100",
+      "abuseScoreLabel": "Abuse confidence score",
+      "abuseReports": "{reports, plural, one {# reporte} other {# reportes}} de {users, plural, one {# usuario} other {# usuarios}}",
+      "sbFlagged": "Marcado como amenaza",
+      "sbClean": "Sin amenazas",
+      "sbCleanHint": "Google Safe Browsing no marca esta URL."
+    },
+    "tls": {
+      "title": "TLS Intelligence",
+      "subtitle": "Protocolos, advertencias y certificado",
+      "protocols": "Protocolos",
+      "noProtocols": "testssl.sh no informó protocolos",
+      "warningsBySeverity": "Advertencias por severidad",
+      "warningsCaveat": "Solo cuentan hallazgos con severidad de advertencia; las líneas OK e informativas no se suman.",
+      "certificate": "Certificado",
+      "noCertificate": "testssl.sh no informó datos del certificado",
+      "cert": {
+        "cert_commonName": "Subject",
+        "cert_expirationStatus": "Vencimiento",
+        "cert_notAfter": "Vence",
+        "cert_keySize": "Tamaño de llave",
+        "cert_signatureAlgorithm": "Algoritmo de firma",
+        "cert_chain_of_trust": "Cadena de confianza"
+      }
+    },
+    "sources": {
+      "title": "Cobertura de fuentes",
+      "subtitle": "Las 7 fuentes de Huella Digital y su estado en este análisis"
+    },
+    "result": {
+      "crtsh": "{count, plural, one {# subdominio} other {# subdominios}}",
+      "dnstwist": "{count, plural, one {# similar} other {# similares}}",
+      "shodan": "{ports} puertos · {cves} CVE",
+      "virustotal": "{count, plural, one {# marca} other {# marcas}}",
+      "abuseipdb": "Score {score}",
+      "safebrowsingFlagged": "Amenaza",
+      "safebrowsingClean": "Sin amenazas",
+      "testssl": "{count, plural, one {# advertencia} other {# advertencias}}"
+    },
+    "detail": {
+      "title": "Detalle por fuente",
+      "subtitle": "Resultados completos de cada fuente, agrupados por categoría"
+    }
+  },
+  "intel": {
+    "noRealData": "Sin datos reales",
+    "host": "host",
+    "domain": "dominio",
+    "yes": "Sí",
+    "no": "No",
+    "reverseDns": "descubierto vía DNS reverso desde",
+    "vt": {
+      "empty": "VirusTotal aún no tiene resultados",
+      "enginesFlagged": "{count, plural, one {# motor en alerta} other {# motores en alerta}}",
+      "clean": "Limpio",
+      "malicious": "maliciosos",
+      "suspicious": "sospechosos",
+      "undetected": "sin detectar",
+      "harmless": "limpios",
+      "enginesTitle": "Motores que marcaron el host",
+      "fullReport": "Ver reporte completo en VirusTotal"
+    },
+    "abuse": {
+      "empty": "AbuseIPDB aún no tiene resultados",
+      "confidenceBadge": "{score}% de confianza de abuso",
+      "noRelevant": "Sin reportes relevantes",
+      "confidence": "confianza de abuso",
+      "totalReports": "reportes totales",
+      "distinctUsers": "usuarios distintos",
+      "whitelisted": "en whitelist",
+      "country": "País",
+      "usage": "Uso",
+      "reportedSummary": "Esta IP fue reportada {reports, plural, one {# vez} other {# veces}} por {users, plural, one {# usuario distinto} other {# usuarios distintos}} en AbuseIPDB.",
+      "lastReport": "Último reporte: {date}.",
+      "fullReport": "Ver reporte completo en AbuseIPDB"
+    },
+    "sb": {
+      "empty": "Safe Browsing aún no tiene resultados",
+      "flaggedBadge": "Marcado por Google Safe Browsing",
+      "notFlagged": "No marcado",
+      "browsersBlocking": "Chrome y Firefox probablemente estén bloqueando este sitio para los visitantes",
+      "notFlaggedDetail": "Google no tiene este sitio marcado como malware, phishing o software no deseado al momento del escaneo.",
+      "transparencyReport": "Consultar en el Transparency Report de Google"
+    },
+    "shodan": {
+      "empty": "Shodan aún no tiene resultados",
+      "cveBadge": "{count, plural, one {# CVE conocido} other {# CVEs conocidos}}",
+      "riskTags": "Tags de riesgo detectados",
+      "portsBadge": "{count, plural, one {# puerto expuesto} other {# puertos expuestos}}",
+      "openPorts": "puertos abiertos",
+      "cves": "CVEs conocidos",
+      "hostnames": "hostnames",
+      "tags": "tags",
+      "portsTitle": "Puertos abiertos",
+      "tagsTitle": "Tags",
+      "cvesTitle": "CVEs por firma de banner",
+      "bannerCaveat": "Basado en la versión reportada en el banner del servicio — puede estar parchado y seguir mostrando la versión vieja. Confirma antes de reportarlo como hallazgo.",
+      "fullHost": "Ver host completo en Shodan"
+    },
+    "crt": {
+      "empty": "crt.sh aún no tiene resultados",
+      "badge": "{count, plural, one {# subdominio descubierto} other {# subdominios descubiertos}}",
+      "none": "Sin subdominios en Certificate Transparency",
+      "uniqueSubdomains": "subdominios únicos",
+      "certificates": "certificados encontrados",
+      "subdomainsTitle": "Subdominios",
+      "seeMore": "Ver {count} más",
+      "fullSearch": "Ver búsqueda completa en crt.sh"
+    },
+    "dns": {
+      "empty": "dnstwist aún no tiene resultados",
+      "foundBadge": "{count, plural, one {# dominio parecido registrado} other {# dominios parecidos registrados}}",
+      "none": "Sin dominios parecidos registrados",
+      "variantsChecked": "variantes probadas",
+      "registeredToday": "registradas hoy",
+      "title": "Dominios parecidos ya registrados",
+      "note": "Que un dominio esté registrado no significa que sea malicioso — puede ser tuyo, de un competidor o estar sin usar. Vale la pena revisarlo si no lo reconoces."
+    },
+    "tls": {
+      "empty": "testssl.sh aún no tiene resultados",
+      "noTls": "Sin TLS en este puerto",
+      "noTlsDefault": "El objetivo no respondió a un handshake TLS en este puerto.",
+      "vulnBadge": "{count, plural, one {# hallazgo de vulnerabilidad} other {# hallazgos de vulnerabilidad}}",
+      "noVulns": "Sin vulnerabilidades con nombre detectadas",
+      "checks": "{count, plural, one {# chequeo} other {# chequeos}}",
+      "vulnsTitle": "Vulnerabilidades ({found} de {total} con hallazgo)",
+      "noneApply": "Ninguna de las vulnerabilidades con nombre propio (Heartbleed, POODLE, FREAK, DROWN...) aplica a este servidor.",
+      "showChecks": "Ver los {count} chequeos sin hallazgo",
+      "certTitle": "Certificado",
+      "showFields": "Ver los {count} campos más del certificado",
+      "cert": {
+        "cert_commonName": "Subject",
+        "cert_chain_of_trust": "Cadena de confianza",
+        "cert_expirationStatus": "Vencimiento",
+        "cert_notAfter": "Vence",
+        "cert_subjectAltName": "SAN",
+        "cert_keySize": "Tamaño de llave",
+        "cert_signatureAlgorithm": "Algoritmo de firma",
+        "cert_revocation": "Revocación (CRL/OCSP)"
+      }
+    }
+  },
+  "skills": {
+    "wappalyzer": {
+      "short": "Fingerprinting de tecnologías web",
+      "description": "Fingerprinting del stack tecnológico completo. Detecta CMS, frameworks, servidores web, librerías JS y plataformas de e-commerce.",
+      "features": [
+        "Detección de CMS (WordPress, Drupal, Joomla)",
+        "Identificación de frameworks (Laravel, Django, Rails)",
+        "Versiones de servidores web",
+        "Librerías JavaScript y CDNs",
+        "Headers de seguridad"
+      ]
+    },
+    "nmap": {
+      "short": "Escaneo de puertos y servicios activos",
+      "description": "Scanner de red más popular del mundo. Descubre hosts, puertos, servicios, versiones y sistemas operativos.",
+      "features": [
+        "Descubrimiento de puertos TCP/UDP",
+        "Detección de versiones de servicios",
+        "Fingerprinting de sistema operativo",
+        "Scripts NSE para vulnerabilidades",
+        "Detección de firewalls"
+      ]
+    },
+    "gobuster": {
+      "short": "Enumeración de directorios y rutas",
+      "description": "Herramienta de fuerza bruta para descubrir directorios, archivos, subdominios y vhosts en servidores web.",
+      "features": [
+        "Fuerza bruta de directorios y archivos",
+        "Enumeración de subdominios DNS",
+        "Descubrimiento de virtual hosts",
+        "Soporte para múltiples wordlists",
+        "Filtrado por código de estado HTTP"
+      ]
+    },
+    "ffuf": {
+      "short": "Fuzzing rápido de endpoints y rutas API",
+      "description": "Fuzzer web de alta velocidad escrito en Go. Ideal para descubrimiento de contenido, parámetros y subdominios virtuales.",
+      "features": [
+        "Alta velocidad con concurrencia configurable",
+        "Fuzzing de URLs, headers y body",
+        "Descubrimiento de subdominios (vhost)",
+        "Filtrado por tamaño, palabras o status",
+        "Soporte para múltiples wordlists"
+      ]
+    },
+    "zap": {
+      "short": "DAST — Spider y Active Scan completo",
+      "description": "Proxy de seguridad integral para DAST. Spider automático, Ajax Spider, escaneo activo y fuzzing de vulnerabilidades.",
+      "features": [
+        "Spider tradicional y Ajax Spider",
+        "Escaneo activo de vulnerabilidades",
+        "Fuzzing de parámetros GET/POST",
+        "Interceptación de tráfico HTTP/HTTPS",
+        "API REST para automatización completa"
+      ]
+    },
+    "zap-spider": {
+      "short": "Rastreo de URLs, rutas y formularios previo al active scan",
+      "description": "Rastreo (spider) de OWASP ZAP: recorre la aplicación y descubre URLs, rutas y formularios. En PentaWark corre antes del active scan dentro del ZAP full scan, y sus URLs se listan en los resultados de Pentesting.",
+      "features": [
+        "Descubre URLs y rutas navegando la aplicación",
+        "Se ejecuta antes del active scan dentro del ZAP full scan",
+        "Las URLs descubiertas se muestran en la pestaña ZAP Spider"
+      ]
+    },
+    "nuclei": {
+      "short": "Scanner CVE con plantillas YAML actualizadas",
+      "description": "Escáner de vulnerabilidades basado en plantillas YAML de la comunidad. Cubre CVEs, misconfigurations y paneles expuestos.",
+      "features": [
+        "Miles de plantillas YAML de la comunidad",
+        "Detección de CVEs conocidos",
+        "Identificación de misconfigurations",
+        "Paneles de administración expuestos",
+        "Soporte para autenticación con cookies"
+      ]
+    },
+    "injection-scanner": {
+      "short": "Detección activa de 10 tipos de inyección (SQLi, XSS, SSRF…)",
+      "description": "Módulo propio de PentaWark que detecta 10 tipos de inyección con payloads activos. Se ejecuta en el paso de SQLMap; si el módulo no está disponible, el backend usa SQLMap como respaldo.",
+      "features": [
+        "10 técnicas: SQLi, NoSQLi, XPath, XXE, XSS, inyección de comandos, path traversal (LFI), SSRF, SSTI y LDAP",
+        "SQLi en variantes error-based, UNION, boolean-blind, time-blind, auth bypass, stacked y second-order",
+        "Pensado para Juice Shop, DVWA y WebGoat; detección básica en formularios de otros objetivos",
+        "Puede usar la cookie de sesión obtenida por Patator"
+      ]
+    },
+    "patator": {
+      "short": "Brute force HTTP — auto-detecta formulario login",
+      "description": "Herramienta de fuerza bruta modular y multipropósito. Soporta HTTP, SSH, FTP, SMTP y más protocolos.",
+      "features": [
+        "Soporte multiprotocolo (HTTP, SSH, FTP, SMTP)",
+        "Control de hilos y reintentos",
+        "Filtrado por código de respuesta",
+        "Soporte para cookies de sesión",
+        "Compatible con formularios complejos"
+      ]
+    },
+    "sqlmap": {
+      "short": "Detección automática de inyección (10 técnicas, con SQLMap como respaldo)",
+      "description": "Herramienta automática para detección y explotación de inyección SQL. Soporta todos los tipos de SQLi y múltiples DBMS.",
+      "features": [
+        "Detección automática de SQLi (blind, error, time-based, UNION)",
+        "Soporte para MySQL, PostgreSQL, MSSQL, Oracle",
+        "Extracción de bases de datos y tablas",
+        "Compatible con cookies de sesión",
+        "Integración con endpoints descubiertos por ZAP y ffuf"
+      ]
+    },
+    "metasploit": {
+      "short": "Módulos auxiliares MSF (requiere msfrpcd)",
+      "description": "Framework de penetration testing para validación controlada de exploits vía RPC daemon. Requiere autorización explícita.",
+      "features": [
+        "Miles de módulos de exploits y auxiliares",
+        "Control vía API RPC (msfrpcd)",
+        "Solo módulos de verificación en PentaWark",
+        "Payloads personalizables",
+        "Reportes integrados"
+      ]
+    },
+    "searchsploit": {
+      "short": "Búsqueda local de exploits en ExploitDB",
+      "description": "Interfaz CLI para la base de datos Exploit-DB. Búsqueda offline de exploits por servicio/versión con referencia CVE.",
+      "features": [
+        "Más de 45,000 exploits documentados",
+        "Búsqueda offline sin conexión a internet",
+        "Referencia CVE por cada exploit",
+        "Copia local del código del exploit",
+        "Integración con versiones detectadas por Wappalyzer y Nmap"
+      ]
+    },
+    "username-search": {
+      "short": "Revisa ~19 plataformas curadas (GitHub, Reddit, npm...) en paralelo, en segundos."
+    },
+    "sherlock": {
+      "short": "La herramienta real, 414 sitios. Mucho más completa, pero tarda minutos en vez de segundos."
+    },
+    "theharvester": {
+      "short": "A partir de un dominio, descubre correos, subdominios e IPs cruzando varias fuentes públicas."
+    },
+    "xposedornot": {
+      "short": "Verifica si un correo aparece en brechas de datos conocidas (miles de millones de registros)."
+    },
+    "crtsh": {
+      "short": "Subdominios vía Certificate Transparency",
+      "description": "Descubre subdominios a partir de los logs públicos de Certificate Transparency consultando crt.sh. No requiere API key. Puede listar subdominios antiguos que ya no resuelven.",
+      "features": [
+        "Subdominios únicos y número de certificados encontrados",
+        "Servicio público, sin API key",
+        "Si el objetivo es una IP, intenta un DNS reverso (PTR) para obtener un dominio"
+      ]
+    },
+    "dnstwist": {
+      "short": "Typosquatting y phishing",
+      "description": "Detecta dominios de typosquatting y phishing parecidos al objetivo con la librería real dnstwist (14 técnicas, incluidos homoglyphs y bitsquatting) y resuelve cuáles están registrados. Aplica un tope de variantes para mantener el tiempo razonable.",
+      "features": [
+        "Lista los dominios parecidos que ya están registrados, con su IP",
+        "Informa cuántas variantes se probaron",
+        "Si el objetivo es una IP, intenta primero un DNS reverso para hallar un hostname"
+      ]
+    },
+    "shodan": {
+      "short": "Puertos, hostnames y CVEs de la IP",
+      "description": "Exposición externa vía Shodan InternetDB (gratuito, sin API key): puertos abiertos, hostnames, CPEs, tags y CVEs asociados a la IP. Solo trabaja con IPs; si el objetivo es un dominio se resuelve por DNS.",
+      "features": [
+        "Puertos abiertos y hostnames conocidos de la IP",
+        "CVEs deducidos por la versión del banner: pueden ser falsos positivos si el servicio está parchado",
+        "Tags como cdn, vpn, tor o compromised",
+        "No requiere API key; los datos de InternetDB no son en tiempo real"
+      ]
+    },
+    "virustotal": {
+      "short": "Reputación del dominio / IP",
+      "description": "Consulta el reporte que VirusTotal ya tiene del dominio o la IP (API v3); no escanea el objetivo. Requiere la variable VIRUSTOTAL_API_KEY en el servidor: sin ella el resultado se marca como sin datos reales.",
+      "features": [
+        "Veredictos de los motores: malicioso, sospechoso, inofensivo y no detectado",
+        "Lista de motores que marcaron el objetivo",
+        "Enlace al reporte completo en VirusTotal"
+      ]
+    },
+    "abuseipdb": {
+      "short": "Reportes de abuso sobre la IP",
+      "description": "Reputación de la IP en AbuseIPDB (API v2). Solo trabaja con IPs: un dominio se resuelve por DNS y se reporta la IP resultante. Requiere la variable ABUSEIPDB_API_KEY en el servidor.",
+      "features": [
+        "Abuse confidence score (0–100) y número de reportes",
+        "País, ISP y tipo de uso de la IP",
+        "Fecha del último reporte y enlace al detalle en AbuseIPDB"
+      ]
+    },
+    "safebrowsing": {
+      "short": "Malware y phishing según Google",
+      "description": "Comprueba si Google Safe Browsing ya marca la URL como malware, ingeniería social (phishing) o software no deseado. Requiere la variable GOOGLE_SAFE_BROWSING_API_KEY en el servidor.",
+      "features": [
+        "Indica si la URL está marcada como amenaza",
+        "Lista los tipos de amenaza detectados",
+        "Consulta la API v4 threatMatches:find"
+      ]
+    },
+    "testssl": {
+      "short": "Protocolos, vulnerabilidades y certificado TLS",
+      "description": "Analiza la configuración TLS/SSL del objetivo con testssl.sh: protocolos ofrecidos, vulnerabilidades conocidas y datos del certificado. Se conecta directamente al puerto del objetivo.",
+      "features": [
+        "Protocolos ofrecidos (SSLv3, TLS 1.0–1.3) con su severidad",
+        "Vulnerabilidades TLS conocidas (Heartbleed, ROBOT, etc.)",
+        "Datos del certificado: subject, vencimiento, tamaño de llave y algoritmo de firma",
+        "Si el puerto no habla TLS o el análisis excede el tiempo, se informa como error"
+      ]
+    },
+    "gitleaks": {
+      "short": "Secretos hardcodeados (API keys, contraseñas, llaves privadas) con reglas curadas de la comunidad."
+    },
+    "trufflehog": {
+      "short": "Igual que Gitleaks, pero verifica en vivo contra la API real del proveedor si el secreto sigue activo."
+    },
+    "semgrep": {
+      "short": "SAST real: SQLi, XSS, path traversal y más, con ~280 reglas de la comunidad que entienden la sintaxis del código."
+    },
+    "backdoor-scanner": {
+      "short": "Patrones de webshells conocidos: eval+base64 encadenado, exec con input del usuario, deserialización insegura."
+    },
+    "dependency-check": {
+      "short": "Segunda fuente de CVEs en dependencias, para contrastar contra lo que reporta Trivy."
+    },
+    "trivy": {
+      "short": "Dependencias con CVEs conocidos vía lockfiles, o una imagen Docker completa (capa por capa) desde su registro."
+    }
+  }
+}
