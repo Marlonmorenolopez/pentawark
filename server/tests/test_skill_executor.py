@@ -1044,8 +1044,13 @@ class TestWebScanRegression(unittest.TestCase):
         expected_hashes = {
             'save_scan':             '0eab4cdab31c04817600bf6441581c52ed6e4e13873478d3ba0908c42e2b42f2',
             'get_scan':              'f266753712ad2b109648d9eb0ed010b760fdcfaf722b0f54dc49423a2c510caa',
-            'update_step':           'eaa4e87d44d69a7616e45e769215c16d31f4bf82c9bd841f8e9977234330a46e',
-            '_persist_step_result':  '249e3a34cd0e5c967f25213c4a01baa7a70561c46d49561269e0d02d06eacf80',
+            # Code Security: update_step() ahora toma _scan_write_lock y acepta `detail`
+            # (los scanners de código corren en paralelo y se pisaban el estado). Cambio
+            # intencional; hash recalculado.
+            'update_step':           'c7a8bdfba0e9c71b2777d6bbe95a58b4af4b656913c78a84f47681a5d0cbcd2e',
+            # Code Security: _persist_step_result() ahora toma _scan_write_lock (mismo motivo que
+            # update_step). Cambio intencional; hash recalculado.
+            '_persist_step_result':  '8b9746a205af377c45585a4c53574e7ff76b561b0a6f583e4c82f4999359ffd3',
         }
         for fn_name, expected in expected_hashes.items():
             self._assert_function_source_unchanged(fn_name, expected)

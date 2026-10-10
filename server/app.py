@@ -319,7 +319,7 @@ huella_digital_orchestrator = HuellaDigitalOrchestrator(redis_client=redis_clien
 # ── Orchestrator de Análisis de Código (Grupo 3) ────────────────────────────────
 code_orchestrator = CodeScanOrchestrator(
     gitleaks_timeout=int(os.environ.get('SCAN_TIMEOUT_GITLEAKS', 120)),
-    trufflehog_timeout=int(os.environ.get('SCAN_TIMEOUT_TRUFFLEHOG', 120)),
+    trufflehog_timeout=int(os.environ.get('SCAN_TIMEOUT_TRUFFLEHOG', 600)),
     trufflehog_verify=os.environ.get('TRUFFLEHOG_VERIFY', 'true').lower() == 'true',
     semgrep_timeout=int(os.environ.get('SCAN_TIMEOUT_SEMGREP', 180)),
     trivy_timeout=int(os.environ.get('SCAN_TIMEOUT_TRIVY', 120)),
@@ -498,27 +498,38 @@ def list_scans() -> List[dict]:
         return list(scans_fallback.values())
 
 
-def update_step(job_id: str, step_name: str, status: str, progress: int = 0) -> None:
-    scan = get_scan(job_id)
-    if not scan:
-        return
-    for step in scan.get('steps', []):
-        if step['name'] == step_name:
-            step['status']   = status
-            step['progress'] = progress
-            if status == 'running':
-                step['startTime'] = int(time.time() * 1000)
-            elif status in ('completed', 'error'):
-                step['endTime'] = int(time.time() * 1000)
-            break
-    save_scan(job_id, scan)
+# Lock de escritura de scans: los scanners de código corren EN PARALELO (hilos) y cada
+# uno actualiza el mismo dict del scan con leer-modificar-guardar -- sin esto, dos hilos
+# podían pisarse y perder el resultado/estado de una herramienta.
+_scan_write_lock = threading.RLock()
+
+
+def update_step(job_id: str, step_name: str, status: str, progress: int = 0, detail: str = None) -> None:
+    with _scan_write_lock:
+        scan = get_scan(job_id)
+        if not scan:
+            return
+        for step in scan.get('steps', []):
+            if step['name'] == step_name:
+                step['status']   = status
+                step['progress'] = progress
+                if status == 'running':
+                    step['startTime'] = int(time.time() * 1000)
+                    step.pop('detail', None)
+                elif status in ('completed', 'error'):
+                    step['endTime'] = int(time.time() * 1000)
+                if detail:
+                    step['detail'] = detail[:400]
+                break
+        save_scan(job_id, scan)
 
 
 def _persist_step_result(job_id: str, field: str, value) -> None:
-    fresh = get_scan(job_id)
-    if fresh:
-        fresh[field] = value
-        save_scan(job_id, fresh)
+    with _scan_write_lock:
+        fresh = get_scan(job_id)
+        if fresh:
+            fresh[field] = value
+            save_scan(job_id, fresh)
 
 
 # ── SkillExecutor (Fase 1) ──────────────────────────────────────────────────
@@ -957,25 +968,34 @@ def run_code_scan(job_id: str, source_type: str, source_value: str) -> None:
             return
         update_step(job_id, 'Obtener código', 'completed', 100)
 
-        # ── Paso 2-7: los 6 scanners reales ──────────────────────────────────
-        for step_name in ('Gitleaks', 'TruffleHog', 'Backdoors', 'Semgrep', 'Trivy', 'Dependency-Check'):
-            update_step(job_id, step_name, 'running')
+        # ── Paso 2-7: los 6 scanners reales (en paralelo, cada uno con su estado real) ──
+        step_names = code_orchestrator.TOOL_STEP_NAMES
 
-        result = code_orchestrator.scan_directory(code_dir)
+        def _on_start(key: str) -> None:
+            update_step(job_id, step_names[key], 'running')
 
-        _persist_step_result(job_id, 'gitleaks', result['gitleaks'])
-        _persist_step_result(job_id, 'trufflehog', result['trufflehog'])
-        _persist_step_result(job_id, 'backdoors', result['backdoors'])
-        _persist_step_result(job_id, 'semgrep', result['semgrep'])
-        _persist_step_result(job_id, 'trivy', result['trivy'])
-        _persist_step_result(job_id, 'dependency_check', result['dependency_check'])
+        def _on_done(key: str, res: dict) -> None:
+            # Se persiste el resultado de ESTA herramienta apenas termina (el frontend ya
+            # puede mostrarlo) y su paso refleja si realmente funcionó: antes TODOS los
+            # pasos se marcaban "completed" al final aunque la herramienta hubiera fallado.
+            _persist_step_result(job_id, key, res)
+            if res.get('status') == 'completed':
+                update_step(job_id, step_names[key], 'completed', 100, detail=res.get('warning'))
+            else:
+                update_step(job_id, step_names[key], 'error', 0,
+                            detail=res.get('error') or f"Estado: {res.get('status')}")
+
+        result = code_orchestrator.scan_directory(code_dir, on_start=_on_start, on_done=_on_done)
+
         _persist_step_result(job_id, 'summary', result['summary'])
-
-        for step_name in ('Gitleaks', 'TruffleHog', 'Backdoors', 'Semgrep', 'Trivy', 'Dependency-Check'):
-            update_step(job_id, step_name, 'completed', 100)
+        _persist_step_result(job_id, 'tools', result['tools'])
 
         final_scan            = get_scan(job_id) or {}
-        final_scan['status']  = 'completed'
+        all_failed            = result['summary']['tools_completed'] == 0
+        final_scan['status']  = 'error' if all_failed else 'completed'
+        if all_failed:
+            final_scan['error'] = 'Ninguna herramienta pudo completar el análisis: ' + '; '.join(
+                f"{k}: {v.get('error')}" for k, v in result['tools'].items())
         final_scan['endTime'] = datetime.utcnow().isoformat()
         final_scan['score']   = calculate_score_from_findings(findings_module.dedupe_findings(findings_module.normalize_findings(final_scan)))
         save_scan(job_id, final_scan)
@@ -1501,7 +1521,14 @@ def start_code_scan():
 
         # Guardar a disco antes de validar tamaño -- Flask ya limita el
         # tamaño total de request vía MAX_CONTENT_LENGTH a nivel de app.
-        upload_dir = tempfile.mkdtemp(prefix=f'upload-{job_id[:8]}-')
+        # El job corre en el celery-worker (otro contenedor): el ZIP debe estar en un
+        # volumen COMPARTIDO (scan-reports), no en el /tmp local de la API.
+        uploads_root = os.environ.get('CODE_SCAN_UPLOAD_DIR', '/app/reports/uploads')
+        try:
+            os.makedirs(uploads_root, exist_ok=True)
+        except OSError:
+            uploads_root = None  # sin volumen compartido: cae a /tmp (solo válido sin Celery)
+        upload_dir = tempfile.mkdtemp(prefix=f'upload-{job_id[:8]}-', dir=uploads_root)
         zip_path   = os.path.join(upload_dir, 'source.zip')
         upload.save(zip_path)
 

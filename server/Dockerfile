@@ -76,11 +76,11 @@ RUN git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /opt/sqlmap 
 # todo consolidado es mucho más rápido en runtime que apuntar a decenas
 # de carpetas por separado (confirmado: pasar de 91 --config a 1 bajó
 # el tiempo de carga de reglas de forma notoria).
+COPY scripts/consolidate_semgrep_rules.py /tmp/consolidate_semgrep_rules.py
 RUN pip install --no-cache-dir --break-system-packages semgrep \
     && git clone --depth 1 https://github.com/semgrep/semgrep-rules.git /tmp/semgrep-rules \
-    && mkdir -p /opt/semgrep-rules \
-    && python3 -c "import glob, shutil, os; langs = ['php','python','javascript','typescript','java','go','ruby','csharp','dockerfile']; [shutil.copy(f, f'/opt/semgrep-rules/{lang}__{os.path.basename(f)}') for lang in langs for f in glob.glob(f'/tmp/semgrep-rules/{lang}/**/security/*.y*ml', recursive=True)]" \
-    && rm -rf /tmp/semgrep-rules
+    && python3 /tmp/consolidate_semgrep_rules.py /tmp/semgrep-rules /opt/semgrep-rules 400 \
+    && rm -rf /tmp/semgrep-rules /tmp/consolidate_semgrep_rules.py
 
 # ── testssl.sh real (Grupo 1, Huella Digital) ─────────────
 # Reemplaza al equivalente ligero en Python -- este SÍ prueba las
@@ -119,17 +119,23 @@ RUN curl -fsSL -o /tmp/dependency-check.zip \
     && rm /tmp/dependency-check.zip \
     && ln -s /opt/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
 
-# Intentar pre-poblar la base NVD en el build -- CONFIRMADO probando el
-# binario real: sin esta base, Dependency-Check ni siquiera arranca
-# ("Autoupdate is disabled and the database does not exist"), a
-# diferencia de Trivy que al menos falla con un error claro en runtime.
-# La sincronización inicial puede tardar bastante (mucho más rápido con
-# NVD_API_KEY configurada) -- por eso "|| true": si no hay key a mano en
-# el build, el contenedor igual arranca y sincroniza en el primer uso real.
+# Base NVD en un directorio ESCRIBLE por el usuario `scanner` (el de la app).
+# Antes vivía en /opt/dependency-check/data (propiedad de root): el proceso no
+# podía tomar el candado exclusivo de H2 y fallaba con "Unable to obtain an
+# exclusive lock on the H2 database". Se monta como volumen persistente
+# (docker-compose: dependency-check-data) para que sobreviva a los rebuilds.
+ENV DEPENDENCY_CHECK_DATA=/opt/dependency-check-data
+RUN mkdir -p /opt/dependency-check-data
+
+# Intento OPCIONAL de pre-poblar la base en el build. Con NVD_API_KEY suele
+# funcionar; sin ella NVD rechaza/limita y la base queda vacía -- por eso el
+# código de la app (dependency_check.ensure_database) la sincroniza en segundo
+# plano al arrancar si está vacía o vieja, y mientras tanto el paso se marca
+# "skipped" con un mensaje claro en vez de fingir que no hay vulnerabilidades.
 RUN if [ -n "$NVD_API_KEY" ]; then \
-    dependency-check.sh --updateonly --disableVersionCheck --nvdApiKey "$NVD_API_KEY" || true; \
+    dependency-check.sh --updateonly --data /opt/dependency-check-data --disableVersionCheck --nvdApiKey "$NVD_API_KEY" || echo "aviso: no se pudo pre-poblar la base NVD en el build"; \
     else \
-    dependency-check.sh --updateonly --disableVersionCheck || true; \
+    echo "aviso: sin NVD_API_KEY en el build -- la base NVD se sincroniza al arrancar el contenedor"; \
     fi
 
 # ── Herramientas Go ───────────────────────────────────────
@@ -171,14 +177,29 @@ RUN TRUFFLEHOG_VERSION=$(curl -fsSL https://api.github.com/repos/trufflesecurity
 RUN pip install --no-cache-dir python-Wappalyzer requests beautifulsoup4
 
 # ── Wordlists (SecLists) ──────────────────────────────────
-RUN git clone --depth 1 https://github.com/danielmiessler/SecLists.git /opt/SecLists \
-    && mkdir -p /usr/share/wordlists \
+# Descarga solo los archivos que usa el proyecto (en vez de clonar SecLists
+# completo, >1 GB, que falla por cortes de red). common.txt es obligatorio;
+# el resto se intenta y, si no existe, el codigo cae al wordlist secundario.
+RUN set -e; \
+    BASE=https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content; \
+    DEST=/opt/SecLists/Discovery/Web-Content; \
+    mkdir -p "$DEST/CMS" "$DEST/api"; \
+    for f in common.txt CMS/wordpress.fuzz.txt api/api-endpoints.txt; do \
+        curl -fsSL --retry 8 --retry-delay 5 --retry-all-errors --connect-timeout 20 "$BASE/$f" -o "$DEST/$f"; \
+    done; \
+    for f in IIS.fuzz.txt NodeJS.fuzz.txt django.txt laravel.txt spring-boot.txt; do \
+        curl -fsSL --retry 3 --retry-delay 3 --connect-timeout 20 "$BASE/$f" -o "$DEST/$f" || echo "aviso: $f no disponible, se omite"; \
+    done; \
+    mkdir -p /usr/share/wordlists/dirb \
     && ln -s /opt/SecLists /usr/share/wordlists/seclists \
-    && mkdir -p /usr/share/wordlists/dirb \
     && ln -s /opt/SecLists/Discovery/Web-Content/common.txt /usr/share/wordlists/dirb/common.txt
 
 # ── Searchsploit ─────────────────────────────────────────
-RUN git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/exploitdb \
+RUN for i in 1 2 3 4 5; do \
+        git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/exploitdb && break; \
+        echo "git clone fallo (intento $i), reintentando..."; rm -rf /opt/exploitdb; sleep 10; \
+    done; \
+    test -d /opt/exploitdb/.git \
     && ln -sf /opt/exploitdb/searchsploit /usr/local/bin/searchsploit
 
 # ── theHarvester real (Grupo 2, OSINT) ─────────────────────
@@ -215,7 +236,8 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && chmod +x /opt/theHarvester-venv/bin/*
 
 # ── Usuario ──────────────────────────────────────────────
-RUN groupadd -r scanner && useradd -r -g scanner -d /home/scanner -m -s /bin/bash scanner
+RUN groupadd -r scanner && useradd -r -g scanner -d /home/scanner -m -s /bin/bash scanner \
+    && chown -R scanner:scanner /opt/dependency-check-data
 
 # BUG FIX: dar capacidades de red a nmap para que funcione sin root
 RUN setcap cap_net_raw,cap_net_admin+eip /usr/bin/nmap || true

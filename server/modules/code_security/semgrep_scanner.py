@@ -42,10 +42,23 @@ _RULES_DIR = '/opt/semgrep-rules'
 _SEMGREP_SEVERITY = {'ERROR': 'high', 'WARNING': 'medium', 'INFO': 'low'}
 
 
+def _as_list(value: Any) -> List[str]:
+    """
+    Las reglas de Semgrep declaran `cwe`/`owasp` a veces como lista y a veces como un
+    solo string (varía por regla/lenguaje). Se normaliza SIEMPRE a lista de strings:
+    el frontend hacía `.map()` directo y un string suelto rompía toda la página.
+    """
+    if value is None or value == '':
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(v) for v in value if v not in (None, '')]
+    return [str(value)]
+
+
 class SemgrepScanner:
     """Wrapper del binario real de Semgrep — SAST con reglas reales de la comunidad."""
 
-    def __init__(self, timeout: int = 180):
+    def __init__(self, timeout: int = 600):
         self.timeout       = timeout
         self.rules_present = Path(_RULES_DIR).is_dir() and any(Path(_RULES_DIR).iterdir())
         self.available      = shutil.which(_BIN) is not None and self.rules_present
@@ -59,23 +72,26 @@ class SemgrepScanner:
         Corre Semgrep contra `root_path` con las reglas consolidadas.
 
         Returns:
-            Dict con: findings (lista con file, line, rule_id, message,
-            severity, cwe, owasp), error.
+            Dict con: findings (file RELATIVO al repo, line, rule_id, rule,
+            message, severity, cwe, owasp), error, warning, status
+            ('completed'|'error'|'skipped'|'timeout'), files_scanned,
+            rules_loaded.
         """
         root = Path(root_path)
         if not root.exists() or not root.is_dir():
-            return {'findings': [], 'error': f'Directorio no encontrado: {root_path}'}
+            return {'findings': [], 'error': f'Directorio no encontrado: {root_path}', 'status': 'error'}
 
         if not self.available:
             reason = 'Semgrep no está instalado en el servidor' if not shutil.which(_BIN) \
                 else f'Sin reglas consolidadas en {_RULES_DIR} (revisar build)'
-            return {'findings': [], 'error': reason}
+            return {'findings': [], 'error': reason, 'status': 'skipped'}
 
         report_path = f'{root}.semgrep-report.json'
+        rules_loaded = len(list(Path(_RULES_DIR).glob('*.y*ml')))
 
         try:
             try:
-                subprocess.run(
+                proc = subprocess.run(
                     [
                         _BIN, 'scan',
                         '--config', _RULES_DIR,
@@ -84,43 +100,78 @@ class SemgrepScanner:
                         '--quiet',
                         '--disable-version-check',
                         '--metrics', 'off',  # no mandar telemetría a semgrep.dev
+                        '--no-git-ignore',   # el repo clonado trae .gitignore: igual se analiza todo
+                        '--exclude', 'node_modules', '--exclude', '.git',
                         str(root),
                     ],
                     stdin=subprocess.DEVNULL,
                     capture_output=True, text=True, timeout=self.timeout,
                 )
             except subprocess.TimeoutExpired:
-                return {'findings': [], 'error': f'Semgrep no terminó en {self.timeout}s'}
+                return {'findings': [], 'error': f'Semgrep no terminó en {self.timeout}s', 'status': 'timeout',
+                        'rules_loaded': rules_loaded}
             except FileNotFoundError:
-                return {'findings': [], 'error': 'Semgrep no está instalado en el servidor'}
+                return {'findings': [], 'error': 'Semgrep no está instalado en el servidor', 'status': 'skipped'}
 
             report_file = Path(report_path)
             if not report_file.exists():
-                return {'findings': [], 'error': 'Semgrep no generó reporte'}
+                detail = (proc.stderr or proc.stdout or '').strip()[-400:]
+                return {'findings': [], 'status': 'error', 'rules_loaded': rules_loaded,
+                        'error': f'Semgrep no generó reporte (código {proc.returncode}). {detail}'.strip()}
 
             try:
                 data = json.loads(report_file.read_text(encoding='utf-8') or '{}')
             except ValueError as e:
-                return {'findings': [], 'error': f'Error parseando reporte de Semgrep: {e}'}
+                return {'findings': [], 'error': f'Error parseando reporte de Semgrep: {e}', 'status': 'error'}
 
+            root_str = str(root).rstrip('/') + '/'
             findings: List[Dict[str, Any]] = []
+            seen = set()
             for item in data.get('results', []):
                 extra    = item.get('extra', {})
                 metadata = extra.get('metadata', {})
+                start    = item.get('start') or {}
+                path     = item.get('path') or ''
+                if path.startswith(root_str):  # no exponer la ruta temporal interna del servidor
+                    path = path[len(root_str):]
+                rule_id = item.get('check_id') or ''
+                key = (path, start.get('line'), start.get('col'), rule_id)
+                if key in seen:  # Semgrep puede repetir el mismo match (ej. regla con varios patrones)
+                    continue
+                seen.add(key)
                 findings.append({
-                    'file':     item.get('path'),
-                    'line':     (item.get('start') or {}).get('line'),
-                    'rule_id':  item.get('check_id'),
+                    'file':     path,
+                    'line':     start.get('line'),
+                    'rule_id':  rule_id,
+                    'rule':     rule_id.rsplit('.', 1)[-1],
                     'message':  extra.get('message'),
                     'severity': _SEMGREP_SEVERITY.get(extra.get('severity'), 'medium'),
-                    'cwe':      metadata.get('cwe'),
-                    'owasp':    metadata.get('owasp'),
+                    'cwe':      _as_list(metadata.get('cwe')),
+                    'owasp':    _as_list(metadata.get('owasp')),
                 })
 
-            errors = data.get('errors', [])
-            error_msg = f'{len(errors)} regla(s) fallaron al cargar' if errors else None
+            # Errores reportados por Semgrep: los PartialParsing/warn son ruido normal
+            # (archivo con sintaxis rara); los demás (regla inválida, timeout de regla)
+            # sí significan cobertura incompleta, y se dicen con nombre y apellido.
+            real_errors = [e for e in data.get('errors', []) or []
+                           if e.get('level') != 'warn' and e.get('type') not in ('PartialParsing', 'Syntax error')]
+            warning = None
+            if real_errors:
+                samples = '; '.join(
+                    (e.get('message') or e.get('type') or 'error')[:120].replace('\n', ' ')
+                    for e in real_errors[:3])
+                warning = f'{len(real_errors)} error(es) durante el análisis, cobertura posiblemente incompleta: {samples}'
+                logger.warning("Semgrep: %s", warning)
 
-            return {'findings': findings, 'error': error_msg}
+            scanned = (data.get('paths') or {}).get('scanned') or []
+            return {
+                'findings':      findings,
+                'error':         None,
+                'warning':       warning,
+                'status':        'completed',
+                'files_scanned': len(scanned),
+                'rules_loaded':  rules_loaded,
+            }
 
         finally:
             Path(report_path).unlink(missing_ok=True)

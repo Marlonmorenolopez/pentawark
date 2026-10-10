@@ -82,6 +82,7 @@ interface ScanStep {
   progress: number
   startTime?: number
   endTime?: number
+  detail?: string
 }
 
 // CORRECCIÓN #2: Grade expandido con todas las variantes que devuelve
@@ -747,8 +748,8 @@ interface SemgrepFinding {
   rule_id?: string
   message?: string
   severity: string
-  cwe?: string[]
-  owasp?: string[]
+  cwe?: string[] | string
+  owasp?: string[] | string
 }
 
 interface CodeScanStatusResponse {
@@ -761,13 +762,14 @@ interface CodeScanStatusResponse {
   endTime: string | null
   error?: string
   steps: ScanStep[]
-  gitleaks: { findings: GitleaksFinding[]; scanned_git_history: boolean; error: string | null }
-  trufflehog: { findings: TruffleHogFinding[]; scanned_git_history: boolean; error: string | null }
-  backdoors: { findings: CodeFinding[]; files_scanned: number; error: string | null }
-  semgrep: { findings: SemgrepFinding[]; error: string | null }
-  trivy: { findings: TrivyFinding[]; error: string | null }
-  dependency_check: { findings: DependencyCheckFinding[]; error: string | null }
+  gitleaks: { findings: GitleaksFinding[]; scanned_git_history: boolean; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
+  trufflehog: { findings: TruffleHogFinding[]; scanned_git_history: boolean; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
+  backdoors: { findings: CodeFinding[]; files_scanned: number; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
+  semgrep: { findings: SemgrepFinding[]; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
+  trivy: { findings: TrivyFinding[]; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
+  dependency_check: { findings: DependencyCheckFinding[]; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
   summary: CodeScanSummary
+  tools?: Record<string, { status: string; findings: number; duration_s: number; error: string | null; warning: string | null }>
 }
 
 /**

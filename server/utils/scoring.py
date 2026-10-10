@@ -244,10 +244,22 @@ def calculate_grade(
         return 'F', 'Critical: Multiple critical vulnerabilities require immediate attention'
     if critical >= 1:
         return 'D', 'Poor: Critical vulnerability detected - immediate remediation required'
-    if high >= 5:
-        return 'C', 'Fair: Multiple high severity issues present'
+    # Tope por muchos hallazgos altos: la nota es C COMO MÁXIMO. Antes devolvía 'C'
+    # siempre, incluso con puntaje 0 (resultado incoherente: score 0 + nota "C" + riesgo
+    # CRITICAL en el reporte). Ahora se toma la peor entre el tope y la del puntaje.
+    capped_c = high >= 5
     
     # Grade basado en score numérico
+    grade_by_score = _grade_from_score(score)
+    if capped_c and _GRADE_ORDER.index(grade_by_score[0]) < _GRADE_ORDER.index('C'):
+        return 'C', 'Fair: Multiple high severity issues present'
+    return grade_by_score
+
+
+_GRADE_ORDER = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F']
+
+
+def _grade_from_score(score: float) -> Tuple[str, str]:
     if score >= 95:
         return 'A+', 'Excellent: Strong security posture'
     if score >= 90:
@@ -591,18 +603,29 @@ def calculate_score_from_findings(
         weights = DEFAULT_WEIGHTS
 
     breakdown = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}
+    # El breakdown informa TODOS los hallazgos reales, pero el PUNTAJE aplica el mismo tope
+    # por (herramienta, severidad) que el score web (calculate_security_score): sin él, un
+    # repo con 60 hallazgos "high" de una sola regla repetida siempre da 0 y el puntaje deja
+    # de distinguir un repo grave de uno apenas peor. Críticos nunca se topan.
+    caps = {'critical': 9999, 'high': 15, 'medium': 10, 'low': 8, 'info': 5}
+    scored = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}
+    per_bucket: Dict[str, int] = {}
     for f in findings:
         sev = (f.get('severity') or 'info').lower()
         if sev not in breakdown:
             sev = 'info'
         breakdown[sev] += 1
+        bucket = f"{f.get('tool', 'unknown')}:{sev}"
+        if per_bucket.get(bucket, 0) < caps[sev]:
+            per_bucket[bucket] = per_bucket.get(bucket, 0) + 1
+            scored[sev] += 1
 
     raw_score = 100.0
-    raw_score -= breakdown['critical'] * weights.critical
-    raw_score -= breakdown['high'] * weights.high
-    raw_score -= breakdown['medium'] * weights.medium
-    raw_score -= breakdown['low'] * weights.low
-    raw_score -= breakdown['info'] * weights.info
+    raw_score -= scored['critical'] * weights.critical
+    raw_score -= scored['high'] * weights.high
+    raw_score -= scored['medium'] * weights.medium
+    raw_score -= scored['low'] * weights.low
+    raw_score -= scored['info'] * weights.info
 
     total = max(0.0, min(100.0, raw_score))
     grade, grade_description = calculate_grade(total, breakdown, max_cvss=0.0)

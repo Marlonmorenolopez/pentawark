@@ -30,6 +30,7 @@ import shutil
 import subprocess
 import tempfile
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,24 @@ class TheHarvesterRunner:
             'emails': [], 'hosts': [], 'ips': [], 'sources_used': [], 'error': error,
         }
 
+    @staticmethod
+    def _normalize_domain(raw: Optional[str]) -> str:
+        """
+        theHarvester necesita un dominio limpio (ej. 'bugcrowd.com'). Si el
+        usuario pega una URL ('https://www.bugcrowd.com/ruta') las fuentes
+        no devuelven nada, así que se quita esquema, ruta, puerto y 'www.'.
+        """
+        value = (raw or '').strip().lower()
+        if not value:
+            return ''
+        if '://' not in value:
+            value = f'//{value}'
+        host = urlparse(value).hostname or ''
+        host = host.strip('.')
+        if host.startswith('www.'):
+            host = host[4:]
+        return host
+
     def run(self, domain: str) -> Dict[str, Any]:
         """
         Corre theHarvester contra `domain` usando solo fuentes gratuitas.
@@ -70,7 +89,7 @@ class TheHarvesterRunner:
             Dict con: domain, available, simulated, emails, hosts
             (subdominios), ips, sources_used, error.
         """
-        domain = (domain or '').strip().lower()
+        domain = self._normalize_domain(domain)
         if not domain:
             return self._empty(domain, error='Falta el dominio')
 

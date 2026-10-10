@@ -32,9 +32,46 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, List
 
+from modules.code_security.secret_utils import mask_secret
+
 logger = logging.getLogger(__name__)
 
 _BIN = 'trufflehog'
+
+
+def _parse_findings(stdout: str) -> List[Dict[str, Any]]:
+    """Parsea la salida JSON Lines de TruffleHog (un objeto JSON por hallazgo)."""
+    findings: List[Dict[str, Any]] = []
+    for line in (stdout or '').splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            item = json.loads(line)
+        except ValueError:
+            continue  # línea de log que no es JSON de un hallazgo, se ignora
+        if not isinstance(item, dict) or 'DetectorName' not in item:
+            continue  # JSON de log/progreso, no un hallazgo
+
+        secret = item.get('Raw', '') or ''
+        masked = mask_secret(secret)
+        source_data = (item.get('SourceMetadata') or {}).get('Data', {})
+        git_meta = source_data.get('Git') or {}
+        fs_meta  = source_data.get('Filesystem') or {}
+
+        findings.append({
+            'file':          git_meta.get('file') or fs_meta.get('file'),
+            'line':          git_meta.get('line') or fs_meta.get('line'),
+            'detector':      item.get('DetectorName'),
+            'description':   item.get('DetectorDescription'),
+            'verified':      bool(item.get('Verified')),
+            'secret_masked': masked,
+            'severity':      'critical' if item.get('Verified') else 'high',  # verificado en vivo = credencial real y activa
+            'commit':        git_meta.get('commit'),
+            'author':        git_meta.get('email'),
+            'date':          git_meta.get('timestamp'),
+        })
+    return findings
 
 
 class TruffleHogScanner:
@@ -74,44 +111,42 @@ class TruffleHogScanner:
         if not self.verify:
             cmd.append('--no-verification')
 
+        timed_out = False
         try:
             result = subprocess.run(
                 cmd,
                 stdin=subprocess.DEVNULL,
                 capture_output=True, text=True, timeout=self.timeout,
             )
-        except subprocess.TimeoutExpired:
-            return {'findings': [], 'scanned_git_history': has_git, 'error': f'TruffleHog no terminó en {self.timeout}s'}
+            stdout, returncode, stderr = result.stdout or '', result.returncode, result.stderr or ''
+        except subprocess.TimeoutExpired as e:
+            # TruffleHog imprime un JSON por hallazgo A MEDIDA que avanza: lo encontrado antes del
+            # timeout es válido y no se tira (en NodeGoat, 120s no alcanzaron para todo el historial).
+            timed_out = True
+            out = e.stdout or ''
+            stdout = out.decode('utf-8', 'ignore') if isinstance(out, bytes) else out
+            returncode, stderr = 0, ''
         except FileNotFoundError:
-            return {'findings': [], 'scanned_git_history': has_git, 'error': 'TruffleHog no está instalado en el servidor'}
+            return {'findings': [], 'scanned_git_history': has_git, 'status': 'skipped',
+                    'error': 'TruffleHog no está instalado en el servidor'}
 
-        findings: List[Dict[str, Any]] = []
-        for line in result.stdout.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                item = json.loads(line)
-            except ValueError:
-                continue  # línea de log que no es JSON de un hallazgo, se ignora
+        findings = _parse_findings(stdout)
+        verification = 'enabled' if self.verify else 'disabled'
 
-            secret = item.get('Raw', '')
-            masked = f'{secret[:4]}{"*" * max(len(secret) - 8, 0)}{secret[-4:]}' if len(secret) > 8 else '*' * len(secret)
-            source_data = (item.get('SourceMetadata') or {}).get('Data', {})
-            git_meta = source_data.get('Git') or {}
-            fs_meta  = source_data.get('Filesystem') or {}
+        if timed_out:
+            partial = (f' Se conservan {len(findings)} hallazgo(s) parcial(es).' if findings
+                       else ' Sin hallazgos hasta ese momento; el análisis quedó incompleto.')
+            return {'findings': findings, 'scanned_git_history': has_git, 'status': 'timeout',
+                    'error': f'TruffleHog no terminó en {self.timeout}s.{partial} '
+                             'Sube SCAN_TIMEOUT_TRUFFLEHOG o pon TRUFFLEHOG_VERIFY=false.',
+                    'verification': verification}
 
-            findings.append({
-                'file':          git_meta.get('file') or fs_meta.get('file'),
-                'line':          git_meta.get('line') or fs_meta.get('line'),
-                'detector':      item.get('DetectorName'),
-                'description':   item.get('DetectorDescription'),
-                'verified':      bool(item.get('Verified')),
-                'secret_masked': masked,
-                'severity':      'critical' if item.get('Verified') else 'high',  # verificado en vivo = credencial real y activa
-                'commit':        git_meta.get('commit'),
-                'author':        git_meta.get('email'),
-                'date':          git_meta.get('timestamp'),
-            })
+        # Código != 0 sin hallazgos = fallo real (flag inválido, repo ilegible...), no "limpio".
+        if returncode != 0 and not findings:
+            detail = stderr.strip()[-400:] or f'código de salida {returncode}'
+            logger.warning("TruffleHog falló: %s", detail)
+            return {'findings': [], 'scanned_git_history': has_git, 'status': 'error',
+                    'error': f'TruffleHog falló: {detail}'}
 
-        return {'findings': findings, 'scanned_git_history': has_git, 'error': None}
+        return {'findings': findings, 'scanned_git_history': has_git, 'status': 'completed', 'error': None,
+                'verification': verification}

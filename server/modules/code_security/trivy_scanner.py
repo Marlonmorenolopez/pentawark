@@ -144,21 +144,31 @@ class TrivyScanner:
         if not self.available:
             return {'findings': [], 'error': 'Trivy no está instalado en el servidor'}
 
-        data = self._run(
-            # FIX (prueba real): sin --skip-db-update, Trivy intenta refrescar
-            # la base de datos por red en CADA scan aunque ya esté horneada
-            # en /opt/trivy-cache -- si esa red falla (mirror.gcr.io no
-            # siempre alcanzable), el scan entero truena en vez de usar la
-            # base ya disponible localmente. Confirmado en pruebas reales:
-            # "failed to download vulnerability DB... mirror.gcr.io".
-            [_BIN, 'fs', '--scanners', 'vuln', '--format', 'json',
-             '--cache-dir', _CACHE_DIR, '--skip-db-update', '--quiet', str(root)],
-            self.timeout,
-        )
-        if '_error' in data:
-            return {'findings': [], 'error': data['_error']}
+        base = [_BIN, 'fs', '--scanners', 'vuln', '--format', 'json', '--cache-dir', _CACHE_DIR, '--quiet']
+        # --skip-db-update: usa la base ya horneada en /opt/trivy-cache en vez de
+        # refrescarla por red en cada scan (mirror.gcr.io no siempre es alcanzable).
+        data = self._run(base + ['--skip-db-update', str(root)], self.timeout)
 
-        return {'findings': self._extract_vulns(data), 'error': None}
+        # Si la base horneada no existe (el `|| true` del Dockerfile oculta una descarga
+        # fallida en el build), reintentar UNA vez permitiendo descargarla ahora.
+        err = data.get('_error', '')
+        if err and re.search(r'(?i)\b(db|database)\b.*(not found|missing|does not exist|failed)|vulnerability db|--skip-db-update', err):
+            logger.warning("Trivy: base local no disponible, reintentando con descarga: %s", err[:160])
+            data = self._run(base + [str(root)], self.timeout)
+
+        if '_error' in data:
+            return {'findings': [], 'error': data['_error'], 'status': 'error'}
+
+        results = data.get('Results', []) or []
+        return {
+            'findings':         self._extract_vulns(data),
+            'error':            None,
+            'status':           'completed',
+            # Cuántos manifiestos/lockfiles reconoció Trivy: 0 hallazgos con 0 objetivos
+            # significa "no había nada que analizar" (ej. repo sin composer.lock), no "seguro".
+            'targets_analyzed': len(results),
+            'targets':          [r.get('Target') for r in results][:20],
+        }
 
     def scan_image(self, image_ref: str) -> Dict[str, Any]:
         """

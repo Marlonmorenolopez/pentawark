@@ -30,6 +30,8 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
 
+from modules.code_security.secret_utils import mask_secret
+
 logger = logging.getLogger(__name__)
 
 _BIN = 'gitleaks'
@@ -63,7 +65,8 @@ class GitleaksScanner:
             return {'findings': [], 'scanned_git_history': False, 'error': 'Gitleaks no está instalado en el servidor'}
 
         has_git = (root / '.git').is_dir()
-        report_path = tempfile.mktemp(suffix='.json', prefix='gitleaks-')
+        report_dir  = tempfile.mkdtemp(prefix='gitleaks-')  # mktemp() es vulnerable a carreras de nombre
+        report_path = str(Path(report_dir) / 'report.json')
 
         cmd = [
             _BIN, 'detect',
@@ -78,19 +81,29 @@ class GitleaksScanner:
 
         try:
             try:
-                subprocess.run(
+                proc = subprocess.run(
                     cmd,
                     stdin=subprocess.DEVNULL,
                     capture_output=True, text=True, timeout=self.timeout,
                 )
             except subprocess.TimeoutExpired:
-                return {'findings': [], 'scanned_git_history': has_git, 'error': f'Gitleaks no terminó en {self.timeout}s'}
+                return {'findings': [], 'scanned_git_history': has_git, 'status': 'timeout',
+                        'error': f'Gitleaks no terminó en {self.timeout}s'}
             except FileNotFoundError:
                 return {'findings': [], 'scanned_git_history': has_git, 'error': 'Gitleaks no está instalado en el servidor'}
 
+            # Con --exit-code 0, un código != 0 es un fallo REAL de Gitleaks (flag inválido,
+            # repo corrupto...), no "encontró secretos". Antes se confundía con "sin hallazgos".
+            if proc.returncode != 0:
+                detail = (proc.stderr or proc.stdout or '').strip()[-400:] or f'código de salida {proc.returncode}'
+                logger.warning("Gitleaks falló: %s", detail)
+                return {'findings': [], 'scanned_git_history': has_git, 'status': 'error',
+                        'error': f'Gitleaks falló: {detail}'}
+
             report_file = Path(report_path)
             if not report_file.exists():
-                return {'findings': [], 'scanned_git_history': has_git, 'error': None}  # sin hallazgos, gitleaks a veces no escribe el archivo si está vacío
+                # exit 0 y sin archivo = Gitleaks terminó bien y no encontró nada
+                return {'findings': [], 'scanned_git_history': has_git, 'status': 'completed', 'error': None}
 
             try:
                 raw_findings = json.loads(report_file.read_text(encoding='utf-8') or '[]')
@@ -100,7 +113,7 @@ class GitleaksScanner:
             findings: List[Dict[str, Any]] = []
             for item in raw_findings:
                 secret = item.get('Secret', '')
-                masked = f'{secret[:4]}{"*" * max(len(secret) - 8, 0)}{secret[-4:]}' if len(secret) > 8 else '*' * len(secret)
+                masked = mask_secret(secret)
                 findings.append({
                     'file':          item.get('File'),
                     'line':          item.get('StartLine'),
@@ -114,7 +127,7 @@ class GitleaksScanner:
                     'date':          item.get('Date') or None,
                 })
 
-            return {'findings': findings, 'scanned_git_history': has_git, 'error': None}
+            return {'findings': findings, 'scanned_git_history': has_git, 'status': 'completed', 'error': None}
 
         finally:
-            Path(report_path).unlink(missing_ok=True)
+            shutil.rmtree(report_dir, ignore_errors=True)

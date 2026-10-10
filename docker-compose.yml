@@ -96,13 +96,19 @@ services:
       - SCAN_TIMEOUT_SAFEBROWSING=15
       # Análisis de Código (Grupo 3) y OSINT (Grupo 2)
       - SCAN_TIMEOUT_GITLEAKS=120
-      - SCAN_TIMEOUT_TRUFFLEHOG=120
+      # verificación en vivo + historial git completo: 120s no alcanzan (NodeGoat venció)
+      - SCAN_TIMEOUT_TRUFFLEHOG=600
       - TRUFFLEHOG_VERIFY=true
-      - SCAN_TIMEOUT_SEMGREP=180
+      # ~830 reglas consolidadas: cargar+analizar necesita más de 180s
+      - SCAN_TIMEOUT_SEMGREP=600
       - SCAN_TIMEOUT_TRIVY=120
       - SCAN_TIMEOUT_TRIVY_IMAGE=300
       - SCAN_TIMEOUT_CLONE=180
       - SCAN_TIMEOUT_DEPCHECK=600
+      - DEPENDENCY_CHECK_DATA=/opt/dependency-check-data
+      # true = Dependency-Check también analiza package-lock.json (consulta la API de npm, más lento)
+      - DEPENDENCY_CHECK_NODE_AUDIT=${DEPENDENCY_CHECK_NODE_AUDIT:-false}
+      - CODE_SCAN_REVEAL_SECRETS=${CODE_SCAN_REVEAL_SECRETS:-false}
       - SCAN_TIMEOUT_BREACH=15
       - SCAN_TIMEOUT_USERNAME=8
       - SHERLOCK_TIMEOUT_PER_SITE=15
@@ -153,6 +159,9 @@ services:
       - scan-reports:/app/reports
       # BUG FIX: path correcto del Dockerfile (nuclei-templates, no .config/nuclei)
       - nuclei-templates:/home/scanner/nuclei-templates
+      # Base NVD de OWASP Dependency-Check: persistente y COMPARTIDA entre api y
+      # celery-worker (el candado de archivo evita escaneos/actualizaciones simultáneos)
+      - dependency-check-data:/opt/dependency-check-data
       - /dev/shm:/dev/shm
       - /var/run/docker.sock:/var/run/docker.sock
     group_add:
@@ -226,13 +235,19 @@ services:
       - SCAN_TIMEOUT_ABUSEIPDB=30
       - SCAN_TIMEOUT_SAFEBROWSING=15
       - SCAN_TIMEOUT_GITLEAKS=120
-      - SCAN_TIMEOUT_TRUFFLEHOG=120
+      # verificación en vivo + historial git completo: 120s no alcanzan (NodeGoat venció)
+      - SCAN_TIMEOUT_TRUFFLEHOG=600
       - TRUFFLEHOG_VERIFY=true
-      - SCAN_TIMEOUT_SEMGREP=180
+      # ~830 reglas consolidadas: cargar+analizar necesita más de 180s
+      - SCAN_TIMEOUT_SEMGREP=600
       - SCAN_TIMEOUT_TRIVY=120
       - SCAN_TIMEOUT_TRIVY_IMAGE=300
       - SCAN_TIMEOUT_CLONE=180
       - SCAN_TIMEOUT_DEPCHECK=600
+      - DEPENDENCY_CHECK_DATA=/opt/dependency-check-data
+      # true = Dependency-Check también analiza package-lock.json (consulta la API de npm, más lento)
+      - DEPENDENCY_CHECK_NODE_AUDIT=${DEPENDENCY_CHECK_NODE_AUDIT:-false}
+      - CODE_SCAN_REVEAL_SECRETS=${CODE_SCAN_REVEAL_SECRETS:-false}
       - SCAN_TIMEOUT_BREACH=15
       - SCAN_TIMEOUT_USERNAME=8
       - SHERLOCK_TIMEOUT_PER_SITE=15
@@ -280,6 +295,9 @@ services:
       - ./server:/app
       - scan-reports:/app/reports
       - nuclei-templates:/home/scanner/nuclei-templates
+      # Base NVD de OWASP Dependency-Check: persistente y COMPARTIDA entre api y
+      # celery-worker (el candado de archivo evita escaneos/actualizaciones simultáneos)
+      - dependency-check-data:/opt/dependency-check-data
       - /dev/shm:/dev/shm
       - /var/run/docker.sock:/var/run/docker.sock
     group_add:
@@ -535,8 +553,9 @@ services:
       - "/usr/src/metasploit-framework/msfrpcd -P ${MSF_PASSWORD:-msf} -S -a 0.0.0.0 -p 55553 -f"
     environment:
       - MSF_PASSWORD=${MSF_PASSWORD:-msf}
-    ports:
-      - "55553:55553"
+    # Sin publicar el puerto 55553 en el host: la API y Celery se conectan por
+    # la red interna de Docker (securescan-net). En Windows el puerto suele
+    # estar reservado por Hyper-V/WinNAT y publicarlo rompe el arranque.
     volumes:
       - msf-data:/root/.msf4
     networks:
@@ -573,5 +592,6 @@ volumes:
   dvwa-db-data:
   msf-data:
   nuclei-templates:
+  dependency-check-data:
   juice-shop-data:
   webgoat-data:

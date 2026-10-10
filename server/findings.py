@@ -93,18 +93,40 @@ def _from_web(scan: Dict[str, Any]) -> List[Dict[str, Any]]:
 _CODE_TOOLS = ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check')
 
 
+def _code_title(f: Dict[str, Any]) -> str:
+    """
+    Título legible y ESTABLE de un hallazgo de código. Antes solo se leía 'rule'/'title',
+    que ningún scanner de código devuelve (usan rule_id / type / detector / vuln_id) --
+    todos caían en 'Finding' y, como el fingerprint usaba ese título, los hallazgos de
+    dependencias (sin línea) del mismo archivo se fundían en UNO SOLO.
+    """
+    base = (f.get('rule') or f.get('rule_id') or f.get('type') or f.get('detector')
+            or f.get('vuln_id') or f.get('title') or 'Finding')
+    if f.get('package') and f.get('vuln_id'):
+        return f"{f['vuln_id']} ({f['package']})"
+    return str(base)
+
+
 def _from_code(scan: Dict[str, Any]) -> List[Dict[str, Any]]:
     out = []
     for tool in _CODE_TOOLS:
         section = scan.get(tool) or {}
         for f in section.get('findings', []) or []:
-            title = f.get('rule') or f.get('title') or 'Finding'
+            title  = _code_title(f)
+            target = f.get('file') or f.get('target') or ''
+            if f.get('package'):
+                # (cve, target) es la clave de fusión de dedupe_findings: sin la instancia del paquete,
+                # el mismo CVE en 4 versiones de `minimist` se contaba como UN solo hallazgo.
+                ver = f.get('installed_version')
+                target = f"{target} ({f['package']}{'@' + ver if ver else ''})"
+            vuln   = f.get('vuln_id') or ''
             out.append(_finding(
-                _fp(tool, title, f.get('file', ''), str(f.get('line', ''))),
+                _fp(tool, title, target, str(f.get('line', '')), f.get('package', '') or '', f.get('installed_version', '') or ''),
                 tool, 'code', title, f.get('severity', ''),
-                target=f.get('file', ''),
-                evidence=f.get('description') or f.get('message', ''),
-                cve=f.get('cve', ''), raw=f,
+                target=target,
+                evidence=f.get('description') or f.get('message') or f.get('title') or '',
+                cve=f.get('cve') or (vuln if vuln.upper().startswith('CVE-') else ''),
+                raw=f,
             ))
     return out
 

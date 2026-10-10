@@ -45,7 +45,7 @@ _PHP_PATTERNS = [
     ('eval() genérico',
      re.compile(r'\beval\s*\('), 'medium', 'obfuscation'),
     ('Ejecución de comandos del sistema',
-     re.compile(r'\b(system|exec|passthru|shell_exec|proc_open)\s*\('), 'medium', 'rce'),
+     re.compile(r'\b(system|exec|passthru|shell_exec|proc_open)\s*\(\s*[^)\s]'), 'medium', 'rce'),
 ]
 
 _PYTHON_PATTERNS = [
@@ -81,6 +81,33 @@ _PATTERNS_BY_EXT = {
     '.ts': _JS_PATTERNS,
     '.tsx': _JS_PATTERNS,
 }
+
+
+# Palabras que pueden preceder legítimamente a una llamada en código real
+# ("return shell_exec(...)", "echo system(...)") -- cualquier otra palabra
+# suelta delante ("the file system (load_file)") indica texto en prosa.
+_CODE_KEYWORDS = {'return', 'echo', 'print', 'else', 'and', 'or', 'xor', 'not', 'new', 'await', 'yield', 'throw', 'case', 'in'}
+_COMMENT_PREFIXES = ('//', '/*', '*', '<!--')
+_HASH_COMMENT_EXTS = {'.php', '.phtml', '.py'}
+
+
+def _is_comment(line: str, ext: str) -> bool:
+    stripped = line.lstrip()
+    if stripped.startswith(_COMMENT_PREFIXES):
+        return True
+    return ext in _HASH_COMMENT_EXTS and stripped.startswith('#')
+
+
+def _is_prose_context(line: str, match: 're.Match') -> bool:
+    """True si la coincidencia parece texto en prosa (HTML de ayuda, docs) y no una llamada de código."""
+    before = line[:match.start()]
+    prefix = before.rstrip(' ')
+    if len(prefix) == len(before) or not prefix:  # sin espacio delante: pegado a `;`, `(`, `=`, `.`...
+        return False
+    if not prefix[-1].isalpha():
+        return False
+    word = re.search(r'[A-Za-z_]+$', prefix)
+    return bool(word) and word.group().lower() not in _CODE_KEYWORDS
 
 
 def _iter_files(root: Path):
@@ -129,11 +156,17 @@ class BackdoorScanner:
             relative = str(file_path.relative_to(root))
             matched_lines = set()  # evita reportar la misma línea 2 veces con distintos patrones
 
+            ext = file_path.suffix.lower()
             for line_num, line in enumerate(text.splitlines(), start=1):
                 if line_num in matched_lines:
                     continue
+                if _is_comment(line, ext):  # código comentado no se ejecuta
+                    continue
                 for name, pattern, severity, category in patterns:
-                    if pattern.search(line):
+                    m = pattern.search(line)
+                    if m and severity in ('medium', 'low') and _is_prose_context(line, m):
+                        continue  # texto de ayuda/documentación, no una llamada real
+                    if m:
                         findings.append({
                             'file':     relative,
                             'line':     line_num,
@@ -151,5 +184,6 @@ class BackdoorScanner:
         return {
             'findings':      findings,
             'files_scanned': files_scanned,
+            'status':        'completed',
             'error':         None,
         }

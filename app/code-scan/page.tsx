@@ -43,6 +43,12 @@ function severityBadgeType(severity: string): 'critical' | 'high' | 'medium' | '
   return 'info'
 }
 
+/** Normaliza campos que el backend puede mandar como string suelto o como lista (ej. cwe/owasp de Semgrep). */
+function asList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.filter((x) => x != null && x !== '').map(String)
+  return v ? [String(v)] : []
+}
+
 export default function CodeScanPage() {
   return (
     <Suspense fallback={null}>
@@ -192,7 +198,7 @@ function CodeScanPageInner() {
                 : isRunning
                 ? 'running'
                 : isDone
-                ? (toolResult?.error ? 'error' : 'completed')
+                ? (toolResult?.status ? (toolResult.status === 'completed' ? 'completed' : 'error') : (toolResult?.error ? 'error' : 'completed'))
                 : isError
                 ? 'error'
                 : 'idle'
@@ -327,12 +333,17 @@ function CodeScanPageInner() {
             >
               <div className="space-y-2">
                 {scan.steps.map((step) => (
-                  <div key={step.name} className="flex items-center gap-3 rounded-lg border border-[hsl(var(--border))] px-3 py-2.5">
-                    {step.status === 'completed' && <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />}
+                  <div key={step.name} className="flex items-start gap-3 rounded-lg border border-[hsl(var(--border))] px-3 py-2.5">
+                    {step.status === 'completed' && <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />}
                     {step.status === 'running' && <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[var(--cyber-accent)]" />}
                     {step.status === 'error' && <XCircle className="h-4 w-4 shrink-0 text-red-400" />}
                     {step.status === 'pending' && <div className="h-4 w-4 shrink-0 rounded-full border border-muted-foreground/30" />}
-                    <span className="font-mono text-sm text-foreground">{step.name}</span>
+                    <div className="min-w-0 flex-1">
+                      <span className="font-mono text-sm text-foreground">{step.name}</span>
+                      {step.detail && (
+                        <p className={`mt-0.5 break-words text-xs ${step.status === 'error' ? 'text-red-400' : 'text-yellow-400'}`}>{step.detail}</p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -393,8 +404,8 @@ function CodeScanPageInner() {
                             <CyberBadge type={severityBadgeType(f.severity)} size="sm" />
                             {f.rule_id}
                           </span>
-                          <span className="font-mono text-xs text-muted-foreground">{f.file}:{f.line}</span>
-                          <span className="font-mono text-xs text-foreground">{f.secret_masked}</span>
+                          <span className="min-w-0 break-all font-mono text-xs text-muted-foreground">{f.file}:{f.line}</span>
+                          <span className="max-h-24 w-full overflow-y-auto break-all whitespace-pre-wrap rounded bg-[hsl(var(--muted))]/40 px-2 py-1 font-mono text-xs text-foreground">{f.secret_masked}</span>
                         </div>
                         {f.commit && (
                           <p className="mt-1 font-mono text-[10px] text-muted-foreground">
@@ -433,8 +444,8 @@ function CodeScanPageInner() {
                               <span className="rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-red-400 border border-red-500/30">VERIFICADO EN VIVO</span>
                             )}
                           </span>
-                          <span className="font-mono text-xs text-muted-foreground">{f.file}:{f.line}</span>
-                          <span className="font-mono text-xs text-foreground">{f.secret_masked}</span>
+                          <span className="min-w-0 break-all font-mono text-xs text-muted-foreground">{f.file}:{f.line}</span>
+                          <span className="max-h-24 w-full overflow-y-auto break-all whitespace-pre-wrap rounded bg-[hsl(var(--muted))]/40 px-2 py-1 font-mono text-xs text-foreground">{f.secret_masked}</span>
                         </div>
                         {f.commit && (
                           <p className="mt-1 font-mono text-[10px] text-muted-foreground">
@@ -475,6 +486,9 @@ function CodeScanPageInner() {
 
               {/* Semgrep */}
               <CyberPanel title="Vulnerabilidades en el código (Semgrep)" subtitle="SQLi, XSS, path traversal y más — ~280 reglas reales de la comunidad">
+                {scan.semgrep.warning && (
+                  <p className="mb-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-xs text-yellow-400">{scan.semgrep.warning}</p>
+                )}
                 {scan.semgrep.error && (
                   <p className="mb-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-xs text-yellow-400">{scan.semgrep.error}</p>
                 )}
@@ -496,13 +510,13 @@ function CodeScanPageInner() {
                           <span className="font-mono text-xs text-muted-foreground">{f.file}:{f.line}</span>
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">{f.message}</p>
-                        {(f.cwe?.length || f.owasp?.length) && (
+                        {(asList(f.cwe).length > 0 || asList(f.owasp).length > 0) && (
                           <div className="mt-1.5 flex flex-wrap gap-1">
-                            {f.cwe?.map((c) => (
-                              <span key={c} className="rounded bg-[hsl(var(--muted))]/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{c.split(':')[0]}</span>
+                            {asList(f.cwe).map((c, ci) => (
+                              <span key={`cwe-${ci}`} className="rounded bg-[hsl(var(--muted))]/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{c.split(':')[0]}</span>
                             ))}
-                            {f.owasp?.map((o) => (
-                              <span key={o} className="rounded bg-[hsl(var(--muted))]/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{o}</span>
+                            {asList(f.owasp).map((o, oi) => (
+                              <span key={`owasp-${oi}`} className="rounded bg-[hsl(var(--muted))]/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{o}</span>
                             ))}
                           </div>
                         )}
@@ -554,6 +568,9 @@ function CodeScanPageInner() {
 
               {/* Dependency-Check */}
               <CyberPanel title="Dependencias vulnerables (OWASP Dependency-Check)" subtitle="Segunda fuente, para contrastar contra Trivy">
+                {scan.dependency_check.warning && (
+                  <p className="mb-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-xs text-yellow-400">{scan.dependency_check.warning}</p>
+                )}
                 {scan.dependency_check.error && (
                   <p className="mb-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-xs text-yellow-400">{scan.dependency_check.error}</p>
                 )}
