@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 import { ReportDownloadModal } from '@/components/report-download-modal'
+import { CryptoKeysPanel } from '@/components/code-scan/crypto-keys-panel'
 import {
   startCodeScanFromRepo, startCodeScanFromFile, startCodeScanFromImage, getCodeScanStatus,
 } from '@/lib/api-client'
@@ -191,6 +192,7 @@ function CodeScanPageInner() {
               { key: 'semgrep',          icon: ScanSearch,   name: 'Semgrep',                   category: 'SAST',         skillId: 'semgrep' },
               { key: 'trivy',            icon: PackageSearch, name: 'Trivy',                    category: 'Containers',   skillId: 'trivy' },
               { key: 'dependency_check', icon: ShieldAlert,  name: 'OWASP Dependency-Check',    category: 'Dependencies', skillId: 'dependency-check' },
+              { key: 'crypto_keys',      icon: KeyRound,     name: 'Crypto Keys Inspector',     category: 'Cryptography', skillId: 'crypto-keys' },
             ] as const).map((tool) => {
               const toolResult = (scan as any)?.[tool.key]
               const status = !jobId
@@ -565,6 +567,9 @@ function CodeScanPageInner() {
                   </div>
                 )}
               </CyberPanel>
+
+              {/* Material criptográfico (llaves y certificados) */}
+              {scan.crypto_keys && <CryptoKeysPanel scanId={scan.id} section={scan.crypto_keys} />}
 
               {/* Dependency-Check */}
               <CyberPanel title="Dependencias vulnerables (OWASP Dependency-Check)" subtitle="Segunda fuente, para contrastar contra Trivy">

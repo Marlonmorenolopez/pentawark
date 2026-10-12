@@ -892,7 +892,32 @@ def run_scan(job_id: str, target: str, options: dict):
         save_scan(job_id, failed_scan)
 
 
+# ── Custodia temporal de llaves (Code Scan: material criptográfico) ──────────────
+# Ver modules/code_security/crypto_inspector/vault.py. Los bytes de las llaves NUNCA van al
+# registro del scan ni a los logs: se guardan cifrados, aparte y con caducidad.
+from modules.code_security.crypto_inspector.vault import Vault as _CryptoVault
+from modules.code_security.crypto_inspector import analyze as crypto_analyze
+from modules.code_security.crypto_inspector import export as crypto_export
+
+crypto_vault = _CryptoVault(lambda: redis_client if get_scan_storage() == 'redis' else None)
+
+
 # ── run_code_scan (Grupo 3: Análisis de Código) ────────────────────────────────
+def _stash_crypto_blobs(job_id: str, res: dict) -> None:
+    """Mueve el material crudo de `res['_blobs']` a la custodia temporal y lo elimina de `res`."""
+    blobs = res.pop('_blobs', None) or {}
+    stored = 0
+    for item in res.get('items', []):
+        data = blobs.get(item['id'])
+        if data is not None and crypto_vault.put(job_id, item['id'], data):
+            item['inspectable'] = True
+            stored += 1
+    if blobs and not crypto_vault.enabled:
+        note = ('Inspección detallada desactivada: falta CODE_SCAN_VAULT_KEY en el servidor. '
+                'El análisis público sigue disponible.')
+        res['warning'] = f"{res['warning']} {note}" if res.get('warning') else note
+
+
 def run_code_scan(job_id: str, source_type: str, source_value: str) -> None:
     """
     Pipeline de análisis de código: obtiene el código (clonando un repo
@@ -975,6 +1000,8 @@ def run_code_scan(job_id: str, source_type: str, source_value: str) -> None:
             update_step(job_id, step_names[key], 'running')
 
         def _on_done(key: str, res: dict) -> None:
+            if key == 'crypto_keys':
+                _stash_crypto_blobs(job_id, res)   # saca `_blobs` del resultado antes de persistirlo
             # Se persiste el resultado de ESTA herramienta apenas termina (el frontend ya
             # puede mostrarlo) y su paso refleja si realmente funcionó: antes TODOS los
             # pasos se marcaban "completed" al final aunque la herramienta hubiera fallado.
@@ -1573,6 +1600,7 @@ def start_code_scan():
             {'name': 'Semgrep',           'status': 'pending', 'progress': 0},
             {'name': 'Trivy',             'status': 'pending', 'progress': 0},
             {'name': 'Dependency-Check',  'status': 'pending', 'progress': 0},
+            {'name': 'Material criptográfico', 'status': 'pending', 'progress': 0},
         ]
 
     scan_data = {
@@ -1590,6 +1618,7 @@ def start_code_scan():
         'semgrep':          {},
         'trivy':            {},
         'dependency_check': {},
+        'crypto_keys':      {},
         'summary':          {},
     }
     save_scan(job_id, scan_data)
@@ -1626,6 +1655,108 @@ def get_code_scan_history():
     except Exception as e:
         logger.error("Error retrieving code scan history: %s", e)
         return jsonify({'error': _t('errors.historyFailed')}), 500
+
+
+# ── Code Scan: inspección y exportación de material criptográfico ─────────────────
+# La lógica vive en modules/code_security/crypto_inspector/service.py (probable sin Flask).
+from modules.code_security.crypto_inspector import service as crypto_service
+
+_ITEM_ID_RE = re.compile(r'^[0-9a-f]{16}$')
+_GATE_ERRORS = {'token_required': 'errors.cryptoTokenRequired', 'vault_disabled': 'errors.cryptoVaultDisabled'}
+
+
+def _crypto_json(payload: dict, status: int = 200):
+    resp = jsonify(payload)
+    resp.status_code = status
+    resp.headers['Cache-Control'] = 'no-store'   # nunca cachear material privado
+    return resp
+
+
+def _crypto_private_gate():
+    """Reutiliza require_token y además EXIGE API_TOKEN configurado (ver service.private_gate)."""
+    allow = os.environ.get('CODE_SCAN_ALLOW_PRIVATE_WITHOUT_TOKEN', '').strip().lower() in ('1', 'true', 'yes')
+    rejected = crypto_service.private_gate(bool(API_TOKEN), allow, crypto_vault.enabled)
+    if rejected is None:
+        return None
+    status, code = rejected
+    return _crypto_json({'error': get_t(locale_from_request(request))(_GATE_ERRORS[code]), 'code': code}, status)
+
+
+@app.route('/api/code-scan/<scan_id>/crypto/<item_id>/inspect', methods=['POST'])
+@require_token
+@limiter.limit("60 per hour")
+def inspect_crypto_item(scan_id: str, item_id: str):
+    """
+    Inspección COMPLETA de una llave: solo se pide cuando el usuario abre «Inspeccionar llave».
+    Devuelve parámetros públicos y, si es una llave privada legible, también los privados.
+    Si está cifrada, la contraseña (opcional) llega en el cuerpo; no se registra ni se guarda.
+    """
+    gate = _crypto_private_gate()
+    if gate is not None:
+        return gate
+    _tr = get_t(locale_from_request(request))
+    if not validate_scan_id(scan_id) or not _ITEM_ID_RE.match(item_id or ''):
+        return _crypto_json({'error': _tr('errors.invalidFormat')}, 400)
+    scan = get_scan(scan_id)
+    if not scan or scan.get('scan_type') != 'code':
+        return _crypto_json({'error': _tr('errors.scanNotFound')}, 404)
+    item = crypto_service.find_item(scan, item_id)
+    if item is None:
+        return _crypto_json({'error': _tr('errors.cryptoItemNotFound')}, 404)
+
+    body = request.get_json(silent=True) or {}
+    password, bad = crypto_service.parse_password(body.get('password'))
+    if bad:
+        return _crypto_json({'error': _tr('errors.cryptoInvalidPassword'), 'code': 'invalid_password'}, 400)
+
+    status, payload = crypto_service.inspect_item(crypto_vault, scan_id, item, password)
+    if status != 200:
+        return _crypto_json({'error': _tr('errors.cryptoExpired'), **payload}, status)
+    # Registro SIN contenido: solo identificadores y estado
+    logger.info("crypto inspect scan=%s item=%s status=%s", scan_id[:8], item_id, payload.get('status'))
+    return _crypto_json(payload)
+
+
+@app.route('/api/code-scan/<scan_id>/crypto/export', methods=['POST'])
+@require_token
+@limiter.limit("20 per hour")
+def export_crypto_results(scan_id: str):
+    """
+    Exporta resultados criptográficos. mode='technical' (sin secretos) o mode='full' (incluye parámetros
+    privados; exige confirm=true). El archivo se genera en la respuesta: no se guarda ni entra al historial.
+    """
+    _tr = get_t(locale_from_request(request))
+    if not validate_scan_id(scan_id):
+        return _crypto_json({'error': _tr('errors.invalidFormat')}, 400)
+    scan = get_scan(scan_id)
+    if not scan or scan.get('scan_type') != 'code':
+        return _crypto_json({'error': _tr('errors.scanNotFound')}, 404)
+
+    body = request.get_json(silent=True) or {}
+    mode = body.get('mode', 'technical')
+    fmt = body.get('format', 'json')
+    if mode not in ('technical', 'full') or fmt not in ('json', 'txt'):
+        return _crypto_json({'error': _tr('errors.invalidJson')}, 400)
+    locale = locale_from_request(request)
+
+    if mode == 'technical':
+        report = crypto_export.technical_report(scan, locale)
+    else:
+        gate = _crypto_private_gate()
+        if gate is not None:
+            return gate
+        if body.get('confirm') is not True:
+            return _crypto_json({'error': _tr('errors.cryptoConfirmRequired'), 'code': 'confirmation_required'}, 400)
+        passwords = body.get('passwords') if isinstance(body.get('passwords'), dict) else {}
+        wanted = body.get('item_ids') if isinstance(body.get('item_ids'), list) else None
+        params = crypto_service.collect_full_params(crypto_vault, scan_id, scan, wanted, passwords)
+        report = crypto_export.full_export(scan, params, locale)
+        logger.info("crypto export full scan=%s items=%d", scan_id[:8], len(params))   # sin contenido
+
+    filename = crypto_export.safe_filename(scan_id, mode, fmt)
+    return Response(crypto_export.render(report, fmt), mimetype='application/json' if fmt == 'json' else 'text/plain',
+                    headers={'Content-Disposition': f'attachment; filename="{filename}"',
+                             'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'})
 
 
 @app.route('/api/osint/email-breach', methods=['POST'])

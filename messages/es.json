@@ -1270,6 +1270,105 @@
     },
     "trivy": {
       "short": "Dependencias con CVEs conocidos vía lockfiles, o una imagen Docker completa (capa por capa) desde su registro."
+    },
+    "crypto-keys": {
+      "short": "Detecta e inspecciona llaves y certificados (RSA, EC, DSA, Ed25519, PKCS#12…) con cryptography y OpenSSL, sin usarlos."
+    }
+  },
+  "codeScanCrypto": {
+    "title": "Material criptográfico (llaves y certificados)",
+    "subtitle": "Detecta e inspecciona llaves y certificados del código analizado — análisis estático, sin usar ni ejecutar nada",
+    "emptyTitle": "Sin material criptográfico",
+    "emptyDetail": "No se encontraron llaves, certificados ni contenedores PKCS#12 en el árbol analizado.",
+    "failedTitle": "No se pudo completar el análisis",
+    "failedDetail": "No se pudo verificar si hay material criptográfico. Revisa el error de arriba.",
+    "inspect": "Inspeccionar llave",
+    "notInspectable": "La inspección completa no está disponible para este elemento (custodia temporal desactivada o caducada).",
+    "loading": "Analizando…",
+    "inspectError": "No se pudo inspeccionar la llave.",
+    "copy": "Copiar",
+    "copyAll": "Copiar todos",
+    "copied": "Copiado",
+    "copyFailed": "No se pudo copiar",
+    "public": "Pública",
+    "private": "Privada",
+    "showHex": "Ver hex",
+    "showDecimal": "Ver decimal",
+    "publicParams": "Parámetros públicos",
+    "privateParams": "Parámetros privados",
+    "privateWarning": "Estos son parámetros PRIVADOS. No los compartas ni los pegues en sitios externos. Solo se muestran en pantalla y no se guardan en el historial.",
+    "fullValuesNote": "Valores completos, sin truncar.",
+    "noParams": "No hay parámetros disponibles para este elemento.",
+    "passwordRequired": "La llave está protegida con contraseña. Escribe la contraseña si la conoces.",
+    "passwordPlaceholder": "Contraseña de la llave",
+    "passwordNote": "Se usa solo en memoria para esta consulta. PentaWark no prueba contraseñas por su cuenta ni la guarda.",
+    "wrongPassword": "La contraseña no es correcta.",
+    "decrypt": "Descifrar",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "exportFormat": "Formato de exportación",
+    "exportTechnical": "Exportar informe técnico",
+    "exportFull": "Exportación completa…",
+    "exportTechnicalNote": "El informe técnico no incluye parámetros privados ni contraseñas.",
+    "exportError": "No se pudo exportar.",
+    "fullWarningTitle": "Exportación completa — contiene secretos",
+    "fullWarning": "El archivo incluirá los parámetros privados que se puedan recuperar de las llaves. Guárdalo cifrado y no lo compartas. No incluye contraseñas y no se guarda en el historial.",
+    "fullAcknowledge": "Entiendo el riesgo y estoy autorizado a analizar este material",
+    "fullConfirm": "Exportar con parámetros privados",
+    "limitations": "Limitaciones del análisis",
+    "f": {
+      "type": "Tipo",
+      "algorithm": "Algoritmo",
+      "size": "Tamaño",
+      "curve": "Curva",
+      "format": "Formato",
+      "status": "Estado",
+      "protection": "Protección",
+      "cipher": "Cifrado",
+      "context": "Contexto",
+      "fingerprint": "Huella SHA-256 (SPKI)",
+      "subject": "Sujeto",
+      "issuer": "Emisor",
+      "notAfter": "Vence",
+      "signature": "Firma",
+      "tools": "Herramientas",
+      "methods": "Métodos"
+    },
+    "types": {
+      "private_key": "Llave privada",
+      "encrypted_private_key": "Llave privada cifrada",
+      "public_key": "Llave pública",
+      "certificate": "Certificado",
+      "pkcs12": "Contenedor PKCS#12",
+      "other": "Otro"
+    },
+    "statuses": {
+      "completed": "Análisis completo",
+      "completed_with_weaknesses": "Completo, con debilidades",
+      "partial": "Parcial",
+      "needs_password": "Requiere contraseña",
+      "unsupported_format": "Formato no soportado",
+      "unsupported_algorithm": "Algoritmo no soportado",
+      "invalid": "Inválido o dañado",
+      "tool_unavailable": "Herramienta no disponible",
+      "error": "Error de análisis"
+    },
+    "protection": {
+      "none": "Sin contraseña",
+      "encrypted": "Cifrada",
+      "n/a": "No aplica",
+      "password-container": "Contenedor con contraseña"
+    },
+    "context": {
+      "project": "Proyecto",
+      "test": "Pruebas",
+      "dependency": "Dependencia"
+    },
+    "kinds": {
+      "weakness": "Debilidad",
+      "possible_exposure": "Posible exposición",
+      "confirmed_exposure": "Exposición confirmada",
+      "active_use": "Uso activo confirmado"
     }
   }
 }

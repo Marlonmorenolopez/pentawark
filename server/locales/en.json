@@ -33,7 +33,13 @@
     "labNotFound": "Lab not found",
     "scanDeleted": "Scan deleted successfully",
     "scanNotCompleted": "Scan not completed yet",
-    "historyFailed": "Failed to retrieve scan history"
+    "historyFailed": "Failed to retrieve scan history",
+    "cryptoTokenRequired": "This operation returns private material and requires API_TOKEN to be configured on the server.",
+    "cryptoVaultDisabled": "Detailed inspection is disabled: CODE_SCAN_VAULT_KEY is missing on the server.",
+    "cryptoItemNotFound": "Cryptographic item not found in this scan",
+    "cryptoExpired": "The material for this key is no longer available (it expired). Run the scan again.",
+    "cryptoInvalidPassword": "Invalid password",
+    "cryptoConfirmRequired": "The full export contains secrets and requires explicit confirmation (confirm=true)."
   },
   "scoring": {
     "critical": "🔴 URGENT: Address {count} critical vulnerability(s) immediately. These pose severe risk to system security.",

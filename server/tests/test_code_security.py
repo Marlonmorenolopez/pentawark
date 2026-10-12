@@ -217,19 +217,21 @@ class TestOrchestrator(unittest.TestCase):
             'trivy': _Fake(exc=RuntimeError('db corrupta')),
             'dependency_check': _Fake({'findings': [], 'error': 'BD NVD vacía', 'status': 'skipped'}),
         }
-        for k in ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check'):
+        # 7 herramientas desde que se añadió 'crypto_keys' (material criptográfico)
+        for k in ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check', 'crypto_keys'):
             setattr(o, k, fakes.get(k) or _Fake({'findings': [], 'error': None}))
         started, done = [], {}
         out = o.scan_directory(tempfile.mkdtemp(), on_start=started.append,
                                on_done=lambda k, r: done.update({k: r['status']}))
         self.assertEqual(sorted(started), sorted(done))
-        self.assertEqual(len(done), 6)
+        self.assertEqual(len(done), 7)
         self.assertEqual(done['trivy'], 'error')
         self.assertIn('db corrupta', out['trivy']['error'])
         self.assertEqual(done['dependency_check'], 'skipped')
         self.assertEqual((done['gitleaks'], done['semgrep']), ('completed', 'completed'))
         self.assertEqual(out['summary']['high'], 1)             # duplicado no cuenta dos veces
-        self.assertEqual(out['summary']['tools_completed'], 4)
+        self.assertEqual(out['summary']['tools_completed'], 5)
+        self.assertEqual(out['summary']['tools_total'], 7)
         self.assertEqual(set(out['summary']['tools_failed']), {'Trivy', 'Dependency-Check'})
         self.assertTrue(all('duration_s' in out[k] for k in ('gitleaks', 'trivy', 'dependency_check')))
 

@@ -109,6 +109,13 @@ services:
       # true = Dependency-Check también analiza package-lock.json (consulta la API de npm, más lento)
       - DEPENDENCY_CHECK_NODE_AUDIT=${DEPENDENCY_CHECK_NODE_AUDIT:-false}
       - CODE_SCAN_REVEAL_SECRETS=${CODE_SCAN_REVEAL_SECRETS:-false}
+      # Inspección de llaves criptográficas (Code Scan). Clave Fernet COMPARTIDA por api y worker:
+      #   python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+      # Sin ella el análisis público funciona, pero «Inspeccionar llave» queda desactivado.
+      - CODE_SCAN_VAULT_KEY=${CODE_SCAN_VAULT_KEY:-}
+      - CODE_SCAN_VAULT_TTL=${CODE_SCAN_VAULT_TTL:-3600}
+      # true = permite inspeccionar llaves aunque API_TOKEN no esté definido (SOLO laboratorio aislado)
+      - CODE_SCAN_ALLOW_PRIVATE_WITHOUT_TOKEN=${CODE_SCAN_ALLOW_PRIVATE_WITHOUT_TOKEN:-false}
       - SCAN_TIMEOUT_BREACH=15
       - SCAN_TIMEOUT_USERNAME=8
       - SHERLOCK_TIMEOUT_PER_SITE=15
@@ -248,6 +255,13 @@ services:
       # true = Dependency-Check también analiza package-lock.json (consulta la API de npm, más lento)
       - DEPENDENCY_CHECK_NODE_AUDIT=${DEPENDENCY_CHECK_NODE_AUDIT:-false}
       - CODE_SCAN_REVEAL_SECRETS=${CODE_SCAN_REVEAL_SECRETS:-false}
+      # Inspección de llaves criptográficas (Code Scan). Clave Fernet COMPARTIDA por api y worker:
+      #   python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+      # Sin ella el análisis público funciona, pero «Inspeccionar llave» queda desactivado.
+      - CODE_SCAN_VAULT_KEY=${CODE_SCAN_VAULT_KEY:-}
+      - CODE_SCAN_VAULT_TTL=${CODE_SCAN_VAULT_TTL:-3600}
+      # true = permite inspeccionar llaves aunque API_TOKEN no esté definido (SOLO laboratorio aislado)
+      - CODE_SCAN_ALLOW_PRIVATE_WITHOUT_TOKEN=${CODE_SCAN_ALLOW_PRIVATE_WITHOUT_TOKEN:-false}
       - SCAN_TIMEOUT_BREACH=15
       - SCAN_TIMEOUT_USERNAME=8
       - SHERLOCK_TIMEOUT_PER_SITE=15

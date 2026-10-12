@@ -350,6 +350,9 @@ def generate_code_scan_html_report(scan: Dict[str, Any], locale: str = 'es') -> 
     sections.append(render_findings(tv.get('findings', []), 'Trivy'))
     dc = scan.get('dependency_check') or {}
     sections.append(render_findings(dc.get('findings', []), 'OWASP Dependency-Check'))
+    # Material criptográfico: solo metadatos/hallazgos públicos. Los parámetros privados NUNCA van a informes.
+    ck = scan.get('crypto_keys') or {}
+    sections.append(render_findings(ck.get('findings', []), 'Material criptográfico'))
 
     summary = scan.get('summary') or {}
     generated_at = datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')
@@ -395,7 +398,7 @@ def generate_code_scan_csv_report(scan: Dict[str, Any]) -> str:
     """CSV con todos los hallazgos de code scan (una fila por hallazgo)."""
     filename = f"code-report-{scan['id']}-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}.csv"
     filepath = os.path.join(REPORTS_DIR, filename)
-    tools = ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check')
+    tools = ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check', 'crypto_keys')
     with open(filepath, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Tool', 'Rule/Title', 'Severity', 'File', 'Line', 'CVE', 'Description', 'Scan ID', 'Source'])

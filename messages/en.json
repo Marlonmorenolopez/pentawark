@@ -1270,6 +1270,105 @@
     },
     "trivy": {
       "short": "Dependencies with known CVEs via lockfiles, or a full Docker image (layer by layer) from its registry."
+    },
+    "crypto-keys": {
+      "short": "Detects and inspects keys and certificates (RSA, EC, DSA, Ed25519, PKCS#12…) with cryptography and OpenSSL, without using them."
+    }
+  },
+  "codeScanCrypto": {
+    "title": "Cryptographic material (keys and certificates)",
+    "subtitle": "Detects and inspects keys and certificates in the analyzed code — static analysis, nothing is used or executed",
+    "emptyTitle": "No cryptographic material",
+    "emptyDetail": "No keys, certificates or PKCS#12 containers were found in the analyzed tree.",
+    "failedTitle": "Analysis could not be completed",
+    "failedDetail": "It could not be verified whether there is cryptographic material. See the error above.",
+    "inspect": "Inspect key",
+    "notInspectable": "Full inspection is not available for this item (temporary custody disabled or expired).",
+    "loading": "Analyzing…",
+    "inspectError": "The key could not be inspected.",
+    "copy": "Copy",
+    "copyAll": "Copy all",
+    "copied": "Copied",
+    "copyFailed": "Copy failed",
+    "public": "Public",
+    "private": "Private",
+    "showHex": "Show hex",
+    "showDecimal": "Show decimal",
+    "publicParams": "Public parameters",
+    "privateParams": "Private parameters",
+    "privateWarning": "These are PRIVATE parameters. Do not share them or paste them into external sites. They are only shown on screen and are not stored in history.",
+    "fullValuesNote": "Full values, not truncated.",
+    "noParams": "No parameters are available for this item.",
+    "passwordRequired": "The key is password-protected. Enter the password if you know it.",
+    "passwordPlaceholder": "Key password",
+    "passwordNote": "Used in memory for this request only. PentaWark never guesses passwords and does not store it.",
+    "wrongPassword": "The password is incorrect.",
+    "decrypt": "Decrypt",
+    "show": "Show",
+    "hide": "Hide",
+    "exportFormat": "Export format",
+    "exportTechnical": "Export technical report",
+    "exportFull": "Full export…",
+    "exportTechnicalNote": "The technical report includes no private parameters or passwords.",
+    "exportError": "Export failed.",
+    "fullWarningTitle": "Full export — contains secrets",
+    "fullWarning": "The file will include any private parameters that can be reliably recovered from the keys. Store it encrypted and do not share it. It includes no passwords and is not saved to history.",
+    "fullAcknowledge": "I understand the risk and I am authorized to analyze this material",
+    "fullConfirm": "Export with private parameters",
+    "limitations": "Analysis limitations",
+    "f": {
+      "type": "Type",
+      "algorithm": "Algorithm",
+      "size": "Size",
+      "curve": "Curve",
+      "format": "Format",
+      "status": "Status",
+      "protection": "Protection",
+      "cipher": "Cipher",
+      "context": "Context",
+      "fingerprint": "SHA-256 fingerprint (SPKI)",
+      "subject": "Subject",
+      "issuer": "Issuer",
+      "notAfter": "Expires",
+      "signature": "Signature",
+      "tools": "Tools",
+      "methods": "Methods"
+    },
+    "types": {
+      "private_key": "Private key",
+      "encrypted_private_key": "Encrypted private key",
+      "public_key": "Public key",
+      "certificate": "Certificate",
+      "pkcs12": "PKCS#12 container",
+      "other": "Other"
+    },
+    "statuses": {
+      "completed": "Analysis complete",
+      "completed_with_weaknesses": "Complete, with weaknesses",
+      "partial": "Partial",
+      "needs_password": "Password required",
+      "unsupported_format": "Unsupported format",
+      "unsupported_algorithm": "Unsupported algorithm",
+      "invalid": "Invalid or corrupt",
+      "tool_unavailable": "Tool unavailable",
+      "error": "Analysis error"
+    },
+    "protection": {
+      "none": "No password",
+      "encrypted": "Encrypted",
+      "n/a": "Not applicable",
+      "password-container": "Password-protected container"
+    },
+    "context": {
+      "project": "Project",
+      "test": "Tests",
+      "dependency": "Dependency"
+    },
+    "kinds": {
+      "weakness": "Weakness",
+      "possible_exposure": "Possible exposure",
+      "confirmed_exposure": "Confirmed exposure",
+      "active_use": "Confirmed active use"
     }
   }
 }

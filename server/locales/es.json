@@ -33,7 +33,13 @@
     "labNotFound": "Laboratorio no encontrado",
     "scanDeleted": "Escaneo eliminado exitosamente",
     "scanNotCompleted": "El escaneo aún no ha finalizado",
-    "historyFailed": "Error al obtener el historial de escaneos"
+    "historyFailed": "Error al obtener el historial de escaneos",
+    "cryptoTokenRequired": "Esta operación entrega material privado y requiere que API_TOKEN esté configurado en el servidor.",
+    "cryptoVaultDisabled": "La inspección detallada está desactivada: falta CODE_SCAN_VAULT_KEY en el servidor.",
+    "cryptoItemNotFound": "Elemento criptográfico no encontrado en este análisis",
+    "cryptoExpired": "El material de esta llave ya no está disponible (caducó). Vuelve a ejecutar el análisis.",
+    "cryptoInvalidPassword": "Contraseña inválida",
+    "cryptoConfirmRequired": "La exportación completa contiene secretos y requiere confirmación explícita (confirm=true)."
   },
   "scoring": {
     "critical": "🔴 URGENTE: Corrige {count} vulnerabilidad(es) crítica(s) inmediatamente. Representan riesgo severo para la seguridad del sistema.",

@@ -752,6 +752,105 @@ interface SemgrepFinding {
   owasp?: string[] | string
 }
 
+
+// ── Material criptográfico (Code Scan) ───────────────────────────────────────
+interface CryptoParam {
+  name: string
+  kind: 'public' | 'private'
+  encoding: string
+  hex: string
+  bits: number | null
+}
+
+interface CryptoToolInfo {
+  tool: string
+  version?: string | null
+  role?: string
+  operation?: string
+  result?: string
+  error?: string | null
+  available?: boolean
+}
+
+interface CryptoWeakness {
+  code: string
+  kind: 'weakness' | 'possible_exposure' | 'confirmed_exposure' | 'active_use' | string
+  severity: string
+  title: string
+  description: string
+  recommendation: string
+}
+
+interface CryptoCertSummary {
+  subject?: string
+  issuer?: string
+  serial?: string
+  not_before?: string
+  not_after?: string
+  expired?: boolean
+  days_to_expiry?: number
+  signature_algorithm?: string
+  signature_hash?: string
+  dns_names?: string[]
+  is_ca?: boolean
+  self_signed?: boolean
+  checks?: Record<string, string>
+}
+
+interface CryptoItem {
+  id: string
+  name: string
+  file: string
+  line: number | null
+  context: 'project' | 'test' | 'dependency'
+  source_format: string
+  pem_label?: string | null
+  material_type: string
+  algorithm?: string | null
+  key_size?: number | null
+  curve?: string | null
+  format?: string | null
+  encoding?: string | null
+  protection?: string | null
+  cipher?: string | null
+  status: string
+  detail_code?: string | null
+  fingerprint?: string | null
+  cert?: CryptoCertSummary | null
+  tools: CryptoToolInfo[]
+  weaknesses: CryptoWeakness[]
+  risk: string | null
+  inspectable: boolean
+  matches?: string[]
+}
+
+interface CryptoKeysSection {
+  findings: unknown[]
+  items: CryptoItem[]
+  error: string | null
+  status?: 'completed' | 'error' | 'skipped' | 'timeout'
+  warning?: string | null
+  duration_s?: number
+  files_visited?: number
+  truncated?: string | null
+  tools?: CryptoToolInfo[]
+  limitations?: string[]
+}
+
+interface CryptoInspectResponse {
+  item_id: string
+  status: string
+  detail_code?: string | null
+  material_type: string
+  algorithm?: string | null
+  key_size?: number | null
+  curve?: string | null
+  protection?: string | null
+  public_params: CryptoParam[]
+  private_params: CryptoParam[]
+  tools: CryptoToolInfo[]
+}
+
 interface CodeScanStatusResponse {
   id: string
   scan_type: 'code'
@@ -768,6 +867,7 @@ interface CodeScanStatusResponse {
   semgrep: { findings: SemgrepFinding[]; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
   trivy: { findings: TrivyFinding[]; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
   dependency_check: { findings: DependencyCheckFinding[]; error: string | null; status?: 'completed' | 'error' | 'skipped' | 'timeout'; warning?: string | null; duration_s?: number }
+  crypto_keys?: CryptoKeysSection
   summary: CodeScanSummary
   tools?: Record<string, { status: string; findings: number; duration_s: number; error: string | null; warning: string | null }>
 }
@@ -861,6 +961,65 @@ export async function getCodeScanStatus(
     return { error: { error: 'Scan ID is required' } }
   }
   return apiRequest<CodeScanStatusResponse>(`/api/code-scan/${scanId}/status`)
+}
+
+/**
+ * Inspección completa de UNA llave. Solo se llama cuando el usuario abre «Inspeccionar llave».
+ * La contraseña (si la hay) la escribe el usuario, va en el cuerpo (nunca en la URL) y no se guarda.
+ */
+export async function inspectCryptoItem(
+  scanId: string,
+  itemId: string,
+  password?: string,
+  locale?: string
+): Promise<ApiResponse<CryptoInspectResponse>> {
+  if (!scanId || !itemId) return { error: { error: 'Scan ID and item ID are required' } }
+  return apiRequest<CryptoInspectResponse>(
+    `/api/code-scan/${encodeURIComponent(scanId)}/crypto/${encodeURIComponent(itemId)}/inspect${locale ? `?lang=${locale}` : ''}`,
+    { method: 'POST', body: JSON.stringify(password ? { password } : {}) },
+    0
+  )
+}
+
+export interface CryptoExportRequest {
+  mode: 'technical' | 'full'
+  format: 'json' | 'txt'
+  /** Obligatorio (true) para mode='full'. */
+  confirm?: boolean
+  /** {item_id: contraseña} solo en memoria; el backend no las incluye en el archivo. */
+  passwords?: Record<string, string>
+  item_ids?: string[]
+}
+
+/** Exporta el resultado criptográfico. La exportación completa exige confirmación explícita. */
+export async function exportCryptoResults(
+  scanId: string,
+  req: CryptoExportRequest,
+  locale?: string
+): Promise<{ blob?: Blob; filename?: string; error?: ApiError }> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/code-scan/${encodeURIComponent(scanId)}/crypto/export${locale ? `?lang=${locale}` : ''}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(API_TOKEN ? { 'X-API-Token': API_TOKEN } : {}),
+        },
+        body: JSON.stringify(req),
+      }
+    )
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }))
+      return { error: errorData }
+    }
+    const blob = await response.blob()
+    const cd = response.headers.get('Content-Disposition') || ''
+    const m = /filename="?([A-Za-z0-9._-]+)"?/.exec(cd)
+    return { blob, filename: m ? m[1] : `crypto-${req.mode}.${req.format}` }
+  } catch (err) {
+    return { error: { error: err instanceof Error ? err.message : 'Network error' } }
+  }
 }
 
 /**
@@ -1072,6 +1231,12 @@ export type {
   HealthResponse,
   CodeScanStartResponse,
   CodeScanStatusResponse,
+  CryptoParam,
+  CryptoToolInfo,
+  CryptoWeakness,
+  CryptoItem,
+  CryptoKeysSection,
+  CryptoInspectResponse,
   CodeFinding,
   DependencyFinding,
   GitleaksFinding,

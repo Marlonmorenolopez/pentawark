@@ -1050,7 +1050,10 @@ class TestWebScanRegression(unittest.TestCase):
             'update_step':           'c7a8bdfba0e9c71b2777d6bbe95a58b4af4b656913c78a84f47681a5d0cbcd2e',
             # Code Security: _persist_step_result() ahora toma _scan_write_lock (mismo motivo que
             # update_step). Cambio intencional; hash recalculado.
-            '_persist_step_result':  '8b9746a205af377c45585a4c53574e7ff76b561b0a6f583e4c82f4999359ffd3',
+            # Code Scan + llaves criptográficas: la regex de captura (ver quirk arriba) abarca el
+            # bloque de custodia temporal (crypto_vault, _stash_crypto_blobs) insertado tras los
+            # helpers de almacenamiento; _persist_step_result en sí no cambió. Hash recalculado.
+            '_persist_step_result':  'a0681e8c322f133924dbdaf027f3554a0d33caee96fa89dc3a1c0797b9254e91',
         }
         for fn_name, expected in expected_hashes.items():
             self._assert_function_source_unchanged(fn_name, expected)

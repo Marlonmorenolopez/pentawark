@@ -4,9 +4,9 @@ Junta los scanners del motor de análisis de código ("Análisis de
 Código", Grupo 3) y corre contra un directorio local ya preparado
 (clonado desde GitHub, o extraído de un archivo subido).
 
-Corre 6 scanners: Gitleaks + TruffleHog (secretos), BackdoorScanner
+Corre 7 scanners: Gitleaks + TruffleHog (secretos), BackdoorScanner
 (heurística propia de webshells), Semgrep (SAST real), y Trivy +
-Dependency-Check (dependencias vulnerables). Todos operan sobre el mismo
+Dependency-Check (dependencias vulnerables) y CryptoKeyScanner (material criptográfico). Todos operan sobre el mismo
 árbol de archivos en disco.
 
 CAMBIOS (diagnóstico del reporte real de DVWA):
@@ -32,6 +32,7 @@ from modules.code_security.trufflehog_scanner import TruffleHogScanner
 from modules.code_security.trivy_scanner import TrivyScanner
 from modules.code_security.dependency_check import DependencyCheckScanner, ensure_database
 from modules.code_security.semgrep_scanner import SemgrepScanner
+from modules.code_security.crypto_inspector import CryptoKeyScanner
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ TOOLS = (
     ('semgrep',          'Semgrep'),
     ('trivy',            'Trivy'),
     ('dependency_check', 'Dependency-Check'),
+    ('crypto_keys',      'Material criptográfico'),
 )
 TOOL_STEP_NAMES = {key: step for key, step in TOOLS}
 
@@ -89,6 +91,7 @@ class CodeScanOrchestrator:
         self.semgrep          = SemgrepScanner(timeout=semgrep_timeout)
         self.trivy            = TrivyScanner(timeout=trivy_timeout, image_timeout=trivy_image_timeout)
         self.dependency_check = DependencyCheckScanner(timeout=dependency_check_timeout, nvd_api_key=nvd_api_key)
+        self.crypto_keys      = CryptoKeyScanner()
 
         # La base NVD de Dependency-Check se sincroniza APARTE (en segundo plano),
         # nunca durante un scan. Si ya está lista y fresca esto no hace nada.
@@ -132,7 +135,7 @@ class CodeScanOrchestrator:
         on_done: Optional[Callable[[str, Dict[str, Any]], None]] = None,
     ) -> Dict[str, Any]:
         """
-        Corre los 6 scanners contra `path` (en paralelo acotado) y arma un resumen.
+        Corre los 7 scanners contra `path` (en paralelo acotado) y arma un resumen.
 
         Args:
             on_start(key): se llama cuando una herramienta EMPIEZA a correr.
@@ -148,12 +151,17 @@ class CodeScanOrchestrator:
         logger.info("CodeScanOrchestrator: iniciando análisis de %s", path)
 
         # Las más lentas primero para que el paralelismo acotado las solape con las rápidas.
-        order = ['dependency_check', 'semgrep', 'trivy', 'gitleaks', 'trufflehog', 'backdoors']
+        order = ['dependency_check', 'semgrep', 'trivy', 'gitleaks', 'trufflehog', 'backdoors', 'crypto_keys']
         results: Dict[str, Dict[str, Any]] = {}
         with ThreadPoolExecutor(max_workers=_MAX_PARALLEL, thread_name_prefix='codescan') as pool:
             futures = {pool.submit(self._run_tool, key, path, on_start, on_done): key for key in order}
             for fut in as_completed(futures):
                 results[futures[fut]] = fut.result()
+
+        # Defensa en profundidad: el material crudo de llaves (`_blobs`) es transitorio; app.py lo
+        # mueve a la custodia en on_done. Si por cualquier razón sigue aquí, se elimina ya.
+        for r in results.values():
+            r.pop('_blobs', None)
 
         summary = self._build_summary(results)
         tools = {
