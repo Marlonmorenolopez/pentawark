@@ -178,6 +178,11 @@ limiter = Limiter(
     key_func=get_remote_address,
     storage_uri=redis_url,
     default_limits=["500 per day", "100 per hour"],
+    # Sin esto, un Redis caído o inalcanzable tumbaba CUALQUIER endpoint con límite
+    # (prácticamente todos) con un 500 sin manejar -- Flask-Limiter no atrapaba el
+    # ConnectionError. Con esto cae a contar en memoria del proceso (por worker, no
+    # compartido) mientras Redis no responda, en vez de romper la app entera.
+    in_memory_fallback_enabled=True,
 )
 
 # ── Configuración ─────────────────────────────────────────────────────────────
@@ -2477,6 +2482,18 @@ def scan_timeline():
 
 
 if __name__ == '__main__':
-    port       = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    port = int(os.environ.get('PORT', 5000))
+    # BUG DE SEGURIDAD corregido: antes esto miraba FLASK_ENV ('development' por
+    # defecto en docker-compose.yml/.env.example), NO FLASK_DEBUG -- así que con la
+    # configuración de ejemplo tal cual (FLASK_DEBUG=0 incluido) el debugger
+    # interactivo de Werkzeug quedaba ACTIVADO igual. Ese debugger expone una
+    # consola con ejecución de código (protegida solo por un PIN) a quien pueda
+    # alcanzar el puerto de la API. Ahora depende únicamente de FLASK_DEBUG,
+    # false por defecto -- que es justo lo que .env.example ya decía que hacía.
+    debug_mode = os.environ.get('FLASK_DEBUG', '0').strip().lower() in ('1', 'true', 'yes')
+    if debug_mode:
+        logger.warning(
+            "FLASK_DEBUG activo: el debugger interactivo de Werkzeug está expuesto "
+            "(ejecución de código protegida solo por PIN). NO usar en un entorno accesible por red."
+        )
     app.run(host='0.0.0.0', port=port, debug=debug_mode)

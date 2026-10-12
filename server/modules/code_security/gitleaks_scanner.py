@@ -37,6 +37,21 @@ logger = logging.getLogger(__name__)
 _BIN = 'gitleaks'
 
 
+def _relativize(file_path, root: Path):
+    """
+    Gitleaks devuelve 'File' tal como se le pasó --source: como `root_path` siempre es un
+    directorio temporal absoluto del servidor, sin esto el hallazgo queda con la ruta completa
+    (ej. '/tmp/codescan-<job>/code/certs/server.key') -- filtra la estructura interna del
+    servidor e queda inconsistente con Semgrep/Backdoors/CryptoKeyScanner, que sí son relativos.
+    """
+    if not file_path:
+        return file_path
+    try:
+        return str(Path(file_path).relative_to(root))
+    except ValueError:
+        return file_path
+
+
 class GitleaksScanner:
     """Wrapper del binario real de Gitleaks — detección de secretos hardcodeados."""
 
@@ -115,7 +130,7 @@ class GitleaksScanner:
                 secret = item.get('Secret', '')
                 masked = mask_secret(secret)
                 findings.append({
-                    'file':          item.get('File'),
+                    'file':          _relativize(item.get('File'), root),
                     'line':          item.get('StartLine'),
                     'rule_id':       item.get('RuleID'),
                     'description':   item.get('Description'),

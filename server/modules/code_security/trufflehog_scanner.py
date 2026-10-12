@@ -30,7 +30,7 @@ import logging
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from modules.code_security.secret_utils import mask_secret
 
@@ -39,7 +39,23 @@ logger = logging.getLogger(__name__)
 _BIN = 'trufflehog'
 
 
-def _parse_findings(stdout: str) -> List[Dict[str, Any]]:
+def _relativize(file_path: Any, root: Optional[Path]) -> Any:
+    """
+    TruffleHog (igual que Gitleaks) devuelve el path TAL COMO se le pasó el target: si `root_path`
+    es absoluto (siempre lo es -- viene de un directorio temporal del propio servidor), el campo
+    'file' del hallazgo queda con la ruta absoluta completa, filtrando la estructura interna del
+    servidor (ej. '/tmp/codescan-<job>/code/...') -- y queda inconsistente con Semgrep/Backdoors/
+    CryptoKeyScanner, que sí reportan rutas relativas al proyecto.
+    """
+    if not file_path or root is None:
+        return file_path
+    try:
+        return str(Path(file_path).relative_to(root))
+    except ValueError:
+        return file_path  # ya era relativo (modo git) o fuera de root por algún link: se deja igual
+
+
+def _parse_findings(stdout: str, root: Optional[Path] = None) -> List[Dict[str, Any]]:
     """Parsea la salida JSON Lines de TruffleHog (un objeto JSON por hallazgo)."""
     findings: List[Dict[str, Any]] = []
     for line in (stdout or '').splitlines():
@@ -60,7 +76,7 @@ def _parse_findings(stdout: str) -> List[Dict[str, Any]]:
         fs_meta  = source_data.get('Filesystem') or {}
 
         findings.append({
-            'file':          git_meta.get('file') or fs_meta.get('file'),
+            'file':          _relativize(git_meta.get('file') or fs_meta.get('file'), root),
             'line':          git_meta.get('line') or fs_meta.get('line'),
             'detector':      item.get('DetectorName'),
             'description':   item.get('DetectorDescription'),
@@ -130,7 +146,7 @@ class TruffleHogScanner:
             return {'findings': [], 'scanned_git_history': has_git, 'status': 'skipped',
                     'error': 'TruffleHog no está instalado en el servidor'}
 
-        findings = _parse_findings(stdout)
+        findings = _parse_findings(stdout, root)
         verification = 'enabled' if self.verify else 'disabled'
 
         if timed_out:

@@ -90,7 +90,7 @@ def _from_web(scan: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 # ── Code Scan ────────────────────────────────────────────────────────────────
 
-_CODE_TOOLS = ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check')
+_CODE_TOOLS = ('gitleaks', 'trufflehog', 'backdoors', 'semgrep', 'trivy', 'dependency_check', 'crypto_keys')
 
 
 def _code_title(f: Dict[str, Any]) -> str:
